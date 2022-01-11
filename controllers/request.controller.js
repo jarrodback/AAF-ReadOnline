@@ -9,7 +9,7 @@ const Request = db.requests;
 exports.create = (req, res) => {
     // Check the request isn't empty
     if (!req.body.name) {
-        res.status(400).send({ message: "Content can not be empty!" });
+        res.status(400).send({ message: "Content can not be empty." });
         return;
     }
 
@@ -23,12 +23,10 @@ exports.create = (req, res) => {
         requestingUser: req.body.requestingUser,
     });
 
-    console.log("Created request: ", request);
     // Save the request in the database
     request
         .save()
         .then((bookData) => {
-            console.log("saved!");
             console.log("Request has been saved in the database: " + bookData);
 
             // Update the user who submitted to the request to contain the request id
@@ -82,7 +80,7 @@ exports.findAll = (req, res) => {
  */
 exports.findOne = (req, res) => {
     // Get the request Id from the body
-    const requestId = { _id: req.body.requestid };
+    const requestId = { _id: req.params.id };
 
     // Search the collection for the request ID
     Request.find(requestId)
@@ -94,7 +92,7 @@ exports.findOne = (req, res) => {
             res.status(500).send({
                 message:
                     err.message ||
-                    "Some error occurred while finding the Request.",
+                    "An error occurred while finding the Request.",
             });
         });
 };
@@ -113,7 +111,7 @@ exports.update = (req, res) => {
     Request.updateOne(requestId, update)
         .then((data) => {
             // Return the data once found and updated
-            res.status(200).send(data);
+            res.send(data);
         })
         .catch((err) => {
             res.status(500).send({
@@ -131,10 +129,10 @@ exports.update = (req, res) => {
  */
 exports.delete = (req, res) => {
     // Get the request Id from the body
-    const requestId = { _id: req.body.requestid };
+    const requestId = { _id: req.params.id };
 
     // Search the collection for the request ID and delete it
-    Request.delete(requestId)
+    Request.deleteOne(requestId)
         .then((data) => {
             // Return the data once found
             res.send(data);
@@ -143,7 +141,7 @@ exports.delete = (req, res) => {
             res.status(500).send({
                 message:
                     err.message ||
-                    "Some error occurred while deleteing the Request.",
+                    "An error occurred while deleteing the Request.",
             });
         });
 };
@@ -155,7 +153,7 @@ exports.delete = (req, res) => {
  */
 exports.deleteAll = (req, res) => {
     // Search the collection and delete all
-    Request.deleteAll()
+    Request.deleteMany()
         .then((data) => {
             // Return the data once found
             res.send(data);
@@ -164,7 +162,7 @@ exports.deleteAll = (req, res) => {
             res.status(500).send({
                 message:
                     err.message ||
-                    "Some error occurred while deleteing all Requests.",
+                    "An error occurred while deleteing all Requests.",
             });
         });
 };

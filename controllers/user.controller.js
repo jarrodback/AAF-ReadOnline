@@ -9,7 +9,7 @@ const User = db.users;
 exports.create = (req, res) => {
     // Validate request
     if (!req.body.username) {
-        res.status(400).send({ message: "Content can not be empty!" });
+        res.status(400).send({ message: "Content can not be empty." });
         return;
     }
 
@@ -30,8 +30,7 @@ exports.create = (req, res) => {
         .catch((err) => {
             res.status(500).send({
                 message:
-                    err.message ||
-                    "Some error occurred while creating the User.",
+                    err.message || "An error occurred while creating the User.",
             });
         });
 };
@@ -49,8 +48,7 @@ exports.findAll = (req, res) => {
         .catch((err) => {
             res.status(500).send({
                 message:
-                    err.message ||
-                    "Some error occurred while retrieving Users.",
+                    err.message || "An error occurred while retrieving Users.",
             });
         });
 };
@@ -62,7 +60,7 @@ exports.findAll = (req, res) => {
  */
 exports.findOne = (req, res) => {
     // Get the user Id from the body
-    const userId = { _id: req.body.userid };
+    const userId = { _id: req.params.id };
 
     // Search the collection for the user ID
     User.find(userId)
@@ -73,8 +71,7 @@ exports.findOne = (req, res) => {
         .catch((err) => {
             res.status(500).send({
                 message:
-                    err.message ||
-                    "Some error occurred while finding the User.",
+                    err.message || "An error occurred while finding the User.",
             });
         });
 };
@@ -86,8 +83,8 @@ exports.findOne = (req, res) => {
  */
 exports.update = (req, res) => {
     // Get the user Id and the update fields from the body
-    const userId = { _id: req.body.userid };
-    const update = req.body.to_update;
+    const userId = { _id: req.params.id };
+    const update = req.body;
 
     // Search the collection for the user ID and update the fields
     User.findByIdAndUpdate(userId, update)
@@ -98,8 +95,7 @@ exports.update = (req, res) => {
         .catch((err) => {
             res.status(500).send({
                 message:
-                    err.message ||
-                    "Some error occurred while updating the User.",
+                    err.message || "An error occurred while updating the User.",
             });
         });
 };
@@ -111,10 +107,10 @@ exports.update = (req, res) => {
  */
 exports.delete = (req, res) => {
     // Get the request Id from the body
-    const requestId = { _id: req.body.requestid };
+    const requestId = { _id: req.params.id };
 
     // Search the collection for the request ID and delete it
-    User.delete(requestId)
+    User.deleteOne(requestId)
         .then((data) => {
             // Return the data once found
             res.send(data);
@@ -123,7 +119,7 @@ exports.delete = (req, res) => {
             res.status(500).send({
                 message:
                     err.message ||
-                    "Some error occurred while deleteing the User.",
+                    "An error occurred while deleteing the User.",
             });
         });
 };
@@ -135,7 +131,7 @@ exports.delete = (req, res) => {
  */
 exports.deleteAll = (req, res) => {
     // Search the collection and delete all
-    User.deleteAll()
+    User.deleteMany()
         .then((data) => {
             // Return the data once found
             res.send(data);
@@ -144,7 +140,7 @@ exports.deleteAll = (req, res) => {
             res.status(500).send({
                 message:
                     err.message ||
-                    "Some error occurred while deleteing all Users.",
+                    "An error occurred while deleteing all Users.",
             });
         });
 };

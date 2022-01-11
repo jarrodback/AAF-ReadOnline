@@ -1,8 +1,8 @@
 // Get database config
 const environment = process.env.NODE_ENV;
-const dbConfig = require("../config/db.config.js")[environment];
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
+const dbConfig = require("../config/db.config.js")[environment];
 
 // Create mongoose and read in config
 const db = {};

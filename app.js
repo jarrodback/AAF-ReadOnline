@@ -30,7 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configuring the main routes
 app.use("/readonline", requestRouter);
-app.use("/users", userRouter);
+app.use("/usermanagement", userRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));

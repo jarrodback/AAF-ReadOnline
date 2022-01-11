@@ -3,10 +3,9 @@ let chaiHttp = require("chai-http");
 let server = require("../app");
 let should = chai.should();
 
-let mongoose = require("mongoose");
-let Request = require("../models/request.model");
-
 chai.use(chaiHttp);
+
+const request1 = "123456789121";
 
 describe("Testing the /readonline/requests path", () => {
     describe("POST /readonline/requests", () => {
@@ -19,7 +18,7 @@ describe("Testing the /readonline/requests path", () => {
                     res.should.have.status(400);
                     res.should.be.a("object");
                     res.body.should.have.property("message");
-                    res.body.message.should.be.eql("Content can not be empty!");
+                    res.body.message.should.be.eql("Content can not be empty.");
 
                     done();
                 });
@@ -61,7 +60,6 @@ describe("Testing the /readonline/requests path", () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
-                    res.body.should.have.property("message");
                     res.body.should.have
                         .property("message")
                         .eql("Welcome to the ReadOnline API.");
@@ -83,21 +81,78 @@ describe("Testing the /readonline/requests path", () => {
                     done();
                 });
         });
+
+        it("should GET the Request", (done) => {
+            chai.request(server)
+                .get("/readonline/requests/" + request1)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body[0].should.be.a("object");
+                    res.body[0].should.have.property("_id");
+                    res.body[0].should.have.property("name").eql("My Book");
+                    res.body[0].should.have.property("datePublished");
+                    res.body[0].should.have.property("cost");
+                    res.body[0].should.have.property("audiobook");
+                    res.body[0].should.have.property("requestingUser");
+
+                    done();
+                });
+        });
     });
 
-    describe("UPDATE /readonline/requests/61dd94ed3eb9374d3b95ac0d", () => {
-        it("it should UPDATE a Request", (done) => {
+    describe("UPDATE /readonline/requests/" + request1, () => {
+        it("it should update a Request", (done) => {
             let to_update = {
                 name: "My new named Book",
             };
             chai.request(server)
-                .put("/readonline/requests/61dd94ed3eb9374d3b95ac0d")
+                .put("/readonline/requests/" + request1)
                 .send(to_update)
                 .end((err, res) => {
-                    console.log(res);
+                    res.should.have.status(200);
+                    done();
+                });
+
+            chai.request(server)
+                .get("/readonline/requests/" + request1)
+                .end((err, res) => {
                     res.should.have.status(200);
 
+                    res.body[0].should.be.a("object");
+                    res.body[0].should.have
+                        .property("name")
+                        .eql("My new named Book");
+                });
+        });
+    });
+
+    describe("DELETE /readonline/requests/" + request1, () => {
+        it("it should delete a Request", (done) => {
+            chai.request(server)
+                .delete("/readonline/requests/" + request1)
+                .end((err, res) => {
+                    res.should.have.status(200);
                     done();
+                });
+        });
+    });
+
+    describe("DELETE /readonline/requests/", () => {
+        it("it should delete all Requests", (done) => {
+            chai.request(server)
+                .delete("/readonline/requests/")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    done();
+                });
+
+            chai.request(server)
+                .get("/readonline/requests/")
+                .end((err, res) => {
+                    res.should.have.status(200);
+
+                    res.body.should.be.a("array");
+                    res.body.length.should.be.eql(0);
                 });
         });
     });
