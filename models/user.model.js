@@ -1,4 +1,4 @@
-module.exports = mongoose => {
+module.exports = (mongoose) => {
     var User = mongoose.model(
         "user",
         mongoose.Schema({
@@ -6,17 +6,24 @@ module.exports = mongoose => {
                 type: String,
                 required: true,
                 lowercase: true,
-                unique: true
+                unique: true,
             },
-            animals: [{
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "animal"
-            }],
-            dateCreated:{
+            email: {
+                type: String,
+                required: true,
+                unique: true,
+            },
+            requests: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "request",
+                },
+            ],
+            dateCreated: {
                 type: Date,
                 required: true,
-                default: Date.now  }
-        
+                default: Date.now,
+            },
         })
     );
     return User;
