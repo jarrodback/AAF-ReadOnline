@@ -19,7 +19,7 @@ export default {
      const res = await api.createrequest(request);
      if (res.success === true)
         this.flash('request created', 'success');
-     this.$router.push(`/request/`);
+     this.$router.push(`/requests/`);
    }
    }
 };

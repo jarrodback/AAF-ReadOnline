@@ -1,66 +1,150 @@
-const db = require("../models");
+const db = require("../database");
 const User = db.users;
-// Create and Save a new User
+
+/**
+ * Create a user
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
 exports.create = (req, res) => {
-     // Validate request
+    // Validate request
     if (!req.body.username) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
-  
-    // Create an User model object
+
+    // Create a User model object
     const user = new User({
-        username: req.body.username
+        username: req.body.username,
+        email: req.body.email,
+        requests: req.body.requests,
+        dateCreated: req.body.dateCreated,
     });
-  
+
     // Save User in the database
-    user
-        .save()
-        .then(data => {
+    user.save()
+        .then((data) => {
             console.log("User saved in the database: " + data);
             res.send(data);
         })
-        .catch(err => {
-            res.status(500).send( {
+        .catch((err) => {
+            res.status(500).send({
                 message:
-                  err.message || "Some error occurred while creating the User."
+                    err.message ||
+                    "Some error occurred while creating the User.",
             });
         });
 };
-// Retrieve all Users from the database.
+
+/**
+ * Find all Users
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
 exports.findAll = (req, res) => {
-    const username = req.query.username;
-    //We use req.query.name to get query string from the Request and consider it as condition for findAll() method.
-    var condition = username ? { username: { $regex: new 
-RegExp(username), $options: "i" } } : {};
-    User
-        .find(condition)
-        .then(data => {
+    User.find()
+        .then((data) => {
             res.send(data);
         })
-        .catch(err => {
-            res.status(500).send( {
-                message: 
-                    err.message || "Some error occurred while retrieving Users."
+        .catch((err) => {
+            res.status(500).send({
+                message:
+                    err.message ||
+                    "Some error occurred while retrieving Users.",
             });
         });
 };
-// Find a single USer with an id
+
+/**
+ * Find a User based on the id provided
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
 exports.findOne = (req, res) => {
- 
+    // Get the user Id from the body
+    const userId = { _id: req.body.userid };
+
+    // Search the collection for the user ID
+    User.find(userId)
+        .then((data) => {
+            // Return the data once found
+            res.send(data);
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message:
+                    err.message ||
+                    "Some error occurred while finding the User.",
+            });
+        });
 };
- 
-// Update a User by the id in the request
+
+/**
+ * Update a User based on the id provided
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
 exports.update = (req, res) => {
- 
+    // Get the user Id and the update fields from the body
+    const userId = { _id: req.body.userid };
+    const update = req.body.to_update;
+
+    // Search the collection for the user ID and update the fields
+    User.findByIdAndUpdate(userId, update)
+        .then((data) => {
+            // Return the data once found and updated
+            res.send(data);
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message:
+                    err.message ||
+                    "Some error occurred while updating the User.",
+            });
+        });
 };
- 
-// Delete a User with the specified id in the request
+
+/**
+ * Delete a User based on the id provided
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
 exports.delete = (req, res) => {
- 
+    // Get the request Id from the body
+    const requestId = { _id: req.body.requestid };
+
+    // Search the collection for the request ID and delete it
+    User.delete(requestId)
+        .then((data) => {
+            // Return the data once found
+            res.send(data);
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message:
+                    err.message ||
+                    "Some error occurred while deleteing the User.",
+            });
+        });
 };
- 
-// Delete all Users from the database.
+
+/**
+ * Delete all Users
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
 exports.deleteAll = (req, res) => {
- 
+    // Search the collection and delete all
+    User.deleteAll()
+        .then((data) => {
+            // Return the data once found
+            res.send(data);
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message:
+                    err.message ||
+                    "Some error occurred while deleteing all Users.",
+            });
+        });
 };

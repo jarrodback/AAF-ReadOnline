@@ -10,13 +10,15 @@ Vue.use(VueFlashMessage, {
     },
 });
 
+const BASE_REQUESTS_URL = "http://localhost:3050/readonline/requests";
+
 const vm = new Vue();
-const baseURL = "http://localhost:3050/readonline/requests/";
 const handleError =
     (fn) =>
     (...params) =>
         fn(...params).catch((error) => {
             console.log("error caught");
+
             vm.flash(
                 `${error.response.status}: ${error.response.statusText}`,
                 "error"
@@ -25,11 +27,12 @@ const handleError =
 
 export const api = {
     getrequest: handleError(async (id) => {
-        const res = await axios.get(baseURL + id);
+        console.log("Window work?", BASE_REQUESTS_URL);
+        const res = await axios.get(BASE_REQUESTS_URL + id);
         return res.data;
     }),
     getrequests: handleError(async () => {
-        const res = await axios.get(baseURL);
+        const res = await axios.get(BASE_REQUESTS_URL);
         console.log("received data: " + JSON.stringify(res.data));
         return res.data;
     }),
@@ -39,7 +42,7 @@ export const api = {
     // }),
     createrequest: handleError(async (payload) => {
         console.log("creating requesat..");
-        const res = await axios.post(baseURL, payload);
+        const res = await axios.post(BASE_REQUESTS_URL, payload);
         console.log("got request");
         return res.data;
     }),

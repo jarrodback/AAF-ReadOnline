@@ -49,7 +49,6 @@ export default {
 this.request.author === '') {
        this.errorsPresent = true;
      } else {
-         console.log("REQUEST: ", this.request);
        this.$emit('createOrUpdate', this.request);
      }
    }

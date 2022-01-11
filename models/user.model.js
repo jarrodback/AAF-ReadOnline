@@ -1,3 +1,4 @@
+// Model for the User
 module.exports = (mongoose) => {
     var User = mongoose.model(
         "user",
