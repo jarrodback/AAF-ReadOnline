@@ -1,21 +1,26 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
-// Adding extra modules
-var bodyParser = require("body-parser");
-var cors = require("cors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 
-// adding the new router
+const app = express();
+
+const cors = require("cors");
+app.use(cors());
+
+/**
+ * Router setup
+ */
 var requestRouter = require("./routes/request.routes");
 var userRouter = require("./routes/user.routes");
 
-var app = express();
+// Configuring the main routes
+app.use("/readonline", requestRouter);
+app.use("/usermanagement", userRouter);
 
-// adding cors module
-app.use(cors());
-// view engine setup
+/**
+ * View Engine setup
+ */
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 app.use(logger("dev"));
@@ -23,21 +28,26 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-// parse requests of content-type - application/json
-app.use(bodyParser.json());
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
 
-// Configuring the main routes
-app.use("/readonline", requestRouter);
-app.use("/usermanagement", userRouter);
-// catch 404 and forward to error handler
+/**
+ * Parsing handling
+ */
+// Parse requests of content-type - application/json and application/x-www-form-urlencoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/**
+ * Error handling
+ */
+// Catch a 404 error
+const createError = require("http-errors");
+
 app.use(function (req, res, next) {
     next(createError(404));
 });
-// error handler
+
 app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
+    // Only show errors in development build
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
     // render the error page

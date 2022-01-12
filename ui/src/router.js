@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import NewRequest from "./views/NewRequest.vue";
+import EditRequest from "./views/EditRequest.vue";
 import ListRequest from "./views/ListRequests.vue";
 
 Vue.use(Router);
@@ -23,6 +24,11 @@ export default new Router({
             path: "/requests/new",
             name: "new-request",
             component: NewRequest,
+        },
+        {
+            path: "/requests/:id/edit",
+            name: "edit-request",
+            component: EditRequest,
         },
     ],
 });
