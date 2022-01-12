@@ -20,6 +20,10 @@ module.exports = (mongoose) => {
                     ref: "request",
                 },
             ],
+            // role: {
+            //     type: mongoose.Schema.Types.ObjectId,
+            //     ref: "role",
+            // },
             dateCreated: {
                 type: Date,
                 required: true,

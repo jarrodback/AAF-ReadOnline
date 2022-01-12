@@ -18,7 +18,30 @@ describe("Testing the /readonline/requests path", () => {
                     res.should.have.status(400);
                     res.should.be.a("object");
                     res.body.should.have.property("message");
-                    res.body.message.should.be.eql("Content can not be empty.");
+                    res.body.message.should.be.eql("Invalid Request data.");
+
+                    done();
+                });
+        });
+
+        it("it should not POST a Request without a valid Type", (done) => {
+            let request = {
+                _id: "myTestId",
+                name: "My Book111111111111",
+                datePublished: new Date(),
+                cost: 40,
+                author: "My Author",
+                type: "Invalid",
+                requestingUser: "61dd56a297402ee89224efb2",
+            };
+            chai.request(server)
+                .post("/readonline/requests")
+                .send(request)
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.should.be.a("object");
+                    res.body.should.have.property("message");
+                    res.body.message.should.be.eql("Invalid Request data.");
 
                     done();
                 });
@@ -31,7 +54,7 @@ describe("Testing the /readonline/requests path", () => {
                 datePublished: new Date(),
                 cost: 40,
                 author: "My Author",
-                audiobook: false,
+                type: "Book",
                 requestingUser: "61dd56a297402ee89224efb2",
             };
             chai.request(server)
@@ -45,7 +68,7 @@ describe("Testing the /readonline/requests path", () => {
                     res.body.should.have.property("name");
                     res.body.should.have.property("datePublished");
                     res.body.should.have.property("cost");
-                    res.body.should.have.property("audiobook");
+                    res.body.should.have.property("type");
                     res.body.should.have.property("requestingUser");
 
                     done();
@@ -92,7 +115,7 @@ describe("Testing the /readonline/requests path", () => {
                     res.body[0].should.have.property("name").eql("My Book");
                     res.body[0].should.have.property("datePublished");
                     res.body[0].should.have.property("cost");
-                    res.body[0].should.have.property("audiobook");
+                    res.body[0].should.have.property("type");
                     res.body[0].should.have.property("requestingUser");
 
                     done();

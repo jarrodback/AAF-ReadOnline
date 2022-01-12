@@ -8,19 +8,21 @@ const Request = db.requests;
  */
 exports.create = (req, res) => {
     // Check the request isn't empty
-    if (!req.body.name) {
-        res.status(400).send({ message: "Content can not be empty." });
+    if (
+        !req.body.name ||
+        (req.body.type != "Book" && req.body.type != "Audiobook")
+    ) {
+        res.status(400).send({ message: "Invalid Request data." });
         return;
     }
-
     // Create a Request model object
     const request = new Request({
         name: req.body.name,
         datePublished: req.body.datePublished,
         cost: req.body.cost,
         author: req.body.author,
-        audiobook: req.body.audiobook,
-        requestingUser: req.body.requestingUser,
+        type: req.body.type,
+        requestingUser: "61dd56a297402ee89224efb2", //req.body.requestingUser,
     });
 
     // Save the request in the database
@@ -58,6 +60,8 @@ exports.create = (req, res) => {
  * @param {Object} res The response returned
  */
 exports.findAll = (req, res) => {
+    // const userId = { _id: "61dd56a297402ee89224efb2" };
+
     // Find all data in the request collection with no condition to find all
     Request.find({})
         .then((data) => {
@@ -135,6 +139,23 @@ exports.delete = (req, res) => {
     Request.deleteOne(requestId)
         .then((data) => {
             // Return the data once found
+            db.users
+                .updateOne(
+                    { requests: req.params.id },
+                    {
+                        $pull: {
+                            requests: req.params.id,
+                        },
+                    }
+                )
+                .then(() => {})
+                .catch(() => {
+                    res.status(500).send({
+                        message:
+                            err.message ||
+                            "An error occurred while deleteing the Request from the User.",
+                    });
+                });
             res.send(data);
         })
         .catch((err) => {

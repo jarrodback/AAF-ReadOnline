@@ -5,31 +5,51 @@ module.exports = (mongoose) => {
         mongoose.Schema({
             name: {
                 type: String,
-                required: true,
+                required: [true, "You must supply the name of the book."],
             },
             datePublished: {
                 type: Date,
                 required: true,
-                default: Date.now,
+                required: [
+                    true,
+                    "You must supply the publishcation date of the book.",
+                ],
             },
             cost: {
                 type: Number,
-                required: true,
+                required: [true, "You must supply the cost of the book."],
             },
             author: {
                 type: String,
-                required: true,
+                required: [true, "You must supply the author of the book."],
             },
-            audiobook: {
-                type: Boolean,
+            type: {
+                type: String,
                 required: true,
-                default: false,
+                enum: {
+                    values: ["Book", "Audiobook"],
+                    message:
+                        "{VALUE} is not valid. The type must be either 'Book' or 'Audiobook'",
+                },
             },
             requestingUser: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "user",
                 required: true,
-                default: "61dd56a297402ee89224efb2",
+            },
+            status: {
+                type: String,
+                enum: {
+                    values: [
+                        "Pending Review",
+                        "In Review",
+                        "New Information Required",
+                        "Accepted",
+                        "Denied",
+                    ],
+                    message: "{VALUE} is not valid.",
+                    default: "Pending Review",
+                },
             },
         })
     );

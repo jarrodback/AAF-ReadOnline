@@ -5,13 +5,19 @@
                 to="/requests"
                 exact
             >
-                List Requests
+                My Requests
             </router-link>
             <router-link
                 to="/requests/new"
                 exact
             >
                 New Request
+            </router-link>
+            <router-link
+                to="/users"
+                exact
+            >
+                View Users
             </router-link>
         </div>
         <div>

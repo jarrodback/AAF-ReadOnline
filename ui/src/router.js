@@ -1,8 +1,13 @@
 import Vue from "vue";
 import Router from "vue-router";
-import NewRequest from "./views/NewRequest.vue";
-import EditRequest from "./views/EditRequest.vue";
-import ListRequest from "./views/ListRequests.vue";
+
+import Main from "./components/Main.vue";
+import NewRequest from "./views/Requests/NewRequest.vue";
+import ListRequest from "./views/Requests/ListRequests.vue";
+import EditRequest from "./views/Requests/EditRequests.vue";
+
+import NewUser from "./views/Users/NewUser.vue";
+import ListUser from "./views/Users/ListUsers.vue";
 
 Vue.use(Router);
 
@@ -13,7 +18,7 @@ export default new Router({
     routes: [
         {
             path: "/",
-            redirect: "/requests/new",
+            component: Main,
         },
         {
             path: "/requests/",
@@ -21,14 +26,25 @@ export default new Router({
             component: ListRequest,
         },
         {
-            path: "/requests/new",
+            path: "/requests/new/",
             name: "new-request",
             component: NewRequest,
         },
         {
-            path: "/requests/:id/edit",
+            path: "/requests/edit/",
             name: "edit-request",
             component: EditRequest,
+            props: true,
+        },
+        {
+            path: "/users/",
+            name: "users",
+            component: ListUser,
+        },
+        {
+            path: "/users/new",
+            name: "new-user",
+            component: NewUser,
         },
     ],
 });

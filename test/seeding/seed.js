@@ -9,7 +9,7 @@ const requests = [
         datePublished: new Date(),
         cost: 40,
         author: "My Author",
-        audiobook: false,
+        type: "Book",
         requestingUser: "61dd56a297402ee89224efb2",
     },
     {
@@ -18,7 +18,7 @@ const requests = [
         datePublished: new Date(),
         cost: 5.03,
         author: "The author of the book",
-        audiobook: true,
+        type: "Audiobook",
         requestingUser: "61dd56a297402ee89224efb2",
     },
 ];

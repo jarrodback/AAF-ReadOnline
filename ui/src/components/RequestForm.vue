@@ -1,47 +1,65 @@
 <template>
-    <form
-        action="#"
-        @submit.prevent="onSubmit"
-    >
-        <p
-            v-if="errorsPresent"
-            class="error"
-        >Please fill out all fields!
-        </p>
-        Name <input
-            type="text"
-            placeholder="Enter name..."
-            v-model="request.name"
-        />
-        <br />
-        Cost <input
-            type="text"
-            placeholder="Enter cost..."
-            v-model="request.cost"
-        />
-        <br />
-        Author
-        <input
-            type="text"
-            placeholder="Enter Author..."
-            v-model="request.author"
-        />
-        <br />
-        Date Published
-        <input
-            type="text"
-            placeholder="Enter date published..."
-            v-model="request.datePublished"
-        />
-        <br />
-        AudioBook? <input
-            type="text"
-            placeholder="Enter if audiobook..."
-            v-model="request.audiobook"
-        />
-        <br />
-        <button class="positive ui button">Submit</button>
-    </form>
+    <div class="center-form">
+        <form
+            action="#"
+            @submit.prevent="onSubmit"
+        >
+            <p
+                v-if="errorsPresent"
+                class="error"
+            >Please fill out all fields!
+            </p>
+
+            Name <input
+                type="text"
+                placeholder="Enter the Book's name..."
+                v-model="request.name"
+            />
+            <br />
+
+            Cost <input
+                type="number"
+                step="0.01"
+                placeholder="Enter the Book's cost..."
+                v-model="request.cost"
+            />
+            <br />
+
+            Author
+            <input
+                type="text"
+                placeholder="Enter the Book's Author..."
+                v-model="request.author"
+            />
+            <br />
+            <label for="datePublished">Date Published:</label>
+            <input
+                type="date"
+                v-model="request.datePublished"
+            >
+            <br />
+
+            <label for="type">Type</label>
+            <select v-model="request.type">
+                <option
+                    id="Book"
+                    value="Book"
+                >Book</option>
+                <option
+                    id="Audiobook"
+                    value="Audiobook"
+                >Audiobook</option>
+            </select>
+            <br />
+
+            <input
+                type="submit"
+                class="button-green"
+                value="Submit"
+            />
+
+        </form>
+    </div>
 </template>
  
 <script>
@@ -54,10 +72,10 @@ export default {
             default: () => {
                 return {
                     name: "",
-                    cost: 1,
+                    cost: "",
                     author: "",
-                    datePublished: Date.now(),
-                    audiobook: false,
+                    datePublished: "",
+                    type: "",
                 };
             },
         },
@@ -72,8 +90,12 @@ export default {
             if (
                 this.request.name === "" ||
                 this.request.cost === "" ||
-                this.request.author === ""
+                this.request.author === "" ||
+                (this.request.type !== "Book" &&
+                    this.request.type !== "Audiobook") ||
+                this.request.datePublished === ""
             ) {
+                console.log(this.request);
                 this.errorsPresent = true;
             } else {
                 this.$emit("createOrUpdate", this.request);

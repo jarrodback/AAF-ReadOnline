@@ -8,6 +8,15 @@ const dbConfig = require("../config/db.config.js")[environment];
 const db = {};
 db.mongoose = mongoose;
 db.url = dbConfig.url;
+
+db.mongoose.plugin((schema) => {
+    schema.pre("updateOne", setRunValidators);
+    schema.pre("findByIdAndUpdate", setRunValidators);
+});
+function setRunValidators() {
+    this.setOptions({ runValidators: true });
+}
+
 db.requests = require("../models/request.model.js")(mongoose);
 db.users = require("../models/user.model.js")(mongoose);
 

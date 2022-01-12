@@ -2,10 +2,11 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-
-const app = express();
-
+const bodyParser = require("body-parser");
 const cors = require("cors");
+
+var app = express();
+
 app.use(cors());
 
 /**
@@ -13,10 +14,6 @@ app.use(cors());
  */
 var requestRouter = require("./routes/request.routes");
 var userRouter = require("./routes/user.routes");
-
-// Configuring the main routes
-app.use("/readonline", requestRouter);
-app.use("/usermanagement", userRouter);
 
 /**
  * View Engine setup
@@ -26,15 +23,19 @@ app.set("view engine", "pug");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// Configuring the main routes
+app.use("/readonline", requestRouter);
+app.use("/usermanagement", userRouter);
 
 /**
  * Parsing handling
  */
 // Parse requests of content-type - application/json and application/x-www-form-urlencoded
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 /**
  * Error handling

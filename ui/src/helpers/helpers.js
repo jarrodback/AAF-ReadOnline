@@ -10,7 +10,8 @@ Vue.use(VueFlashMessage, {
     },
 });
 
-const BASE_REQUESTS_URL = "http://localhost:3050/readonline/requests";
+const BASE_REQUESTS_URL = "http://localhost:3050/readonline/requests/";
+const BASE_USERS_URL = "http://localhost:3050/usermanagement/users/";
 
 const vm = new Vue();
 const handleError =
@@ -26,24 +27,47 @@ const handleError =
         });
 
 export const api = {
-    getrequest: handleError(async (id) => {
+    getRequest: handleError(async (id) => {
         const res = await axios.get(BASE_REQUESTS_URL + id);
         return res.data;
     }),
-    getrequests: handleError(async () => {
+
+    getRequests: handleError(async () => {
         const res = await axios.get(BASE_REQUESTS_URL);
         return res.data;
     }),
-    deletepet: handleError(async (id) => {
-        const res = await axios.delete(BASE_REQUESTS_URL + id);
-        return res.data;
+    deleteRequest: handleError((id) => {
+        const res = axios.delete(BASE_REQUESTS_URL + id);
+        return res;
     }),
-    createrequest: handleError(async (payload) => {
+    createRequest: handleError(async (payload) => {
         const res = await axios.post(BASE_REQUESTS_URL, payload);
         return res.data;
     }),
-    updaterequest: handleError(async (payload) => {
+    updateRequest: handleError(async (payload) => {
         const res = await axios.put(BASE_REQUESTS_URL + payload._id, payload);
+        return res.data;
+    }),
+
+    getUser: handleError(async (id) => {
+        const res = await axios.get(BASE_USERS_URL + id);
+        return res.data;
+    }),
+
+    getUsers: handleError(async () => {
+        const res = await axios.get(BASE_USERS_URL);
+        return res.data;
+    }),
+    deleteUser: handleError((id) => {
+        const res = axios.delete(BASE_USERS_URL + id);
+        return res;
+    }),
+    createUser: handleError(async (payload) => {
+        const res = await axios.post(BASE_USERS_URL, payload);
+        return res.data;
+    }),
+    updateUser: handleError(async (payload) => {
+        const res = await axios.put(BASE_USERS_URL + payload._id, payload);
         return res.data;
     }),
 };
