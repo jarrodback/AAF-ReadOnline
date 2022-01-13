@@ -19,13 +19,10 @@ export default {
         createOrUpdate: async function (request) {
             api.createRequest(request)
                 .then(() => {
-                    console.log("flash?");
                     this.flash("request created", "success");
                     this.$router.push(`/requests/`);
                 })
                 .catch((err) => {
-                    console.log("err?");
-
                     console.error("Failed to create request: ", err);
                 });
         },

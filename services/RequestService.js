@@ -1,7 +1,7 @@
 const MongooseService = require("./MongooseService.js");
-const db = require("../database");
-const createHttpError = require("http-errors");
-const model = db.requests;
+const model = require("../database").getModel("request");
+const isIdValid = require("./utilities").isIdValid;
+const httpError = require("http-errors");
 
 class RequestService {
     /**
@@ -14,72 +14,59 @@ class RequestService {
     }
 
     async createRequest(requestToCreate) {
-        try {
-            const request = {
-                name: requestToCreate.name,
-                datePublished: requestToCreate.datePublished,
-                cost: requestToCreate.cost,
-                author: requestToCreate.author,
-                type: requestToCreate.type,
-                requestingUser: "61dd56a297402ee89224efb2", //TODO Remove this: requestToCreate.requestingUser,
-            };
-            const result = await this.mongooseService.create(request);
-            return { success: true, body: result };
-        } catch (err) {
-            return { success: false, body: err };
+        if (!validateRequest(requestToCreate)) {
+            throw httpError(400, "Request data is invalid.");
         }
+        const request = {
+            name: requestToCreate.name,
+            datePublished: requestToCreate.datePublished,
+            cost: requestToCreate.cost,
+            author: requestToCreate.author,
+            type: requestToCreate.type,
+            requestingUser: "61dd56a297402ee89224efb2", //TODO Remove this: requestToCreate.requestingUser,
+        };
+        return this.mongooseService.create(request);
     }
 
     async findAllRequests() {
-        // try {
-        //     const result = await this.mongooseService.findAll();
-        //     return { success: true, body: result };
-        // } catch (err) {
-        //     return { success: false, body: err };
-        // }
         return this.mongooseService.findAll();
     }
 
     async findRequest(requestToFind) {
-        try {
-            const request_id = { id_: requestToFind };
-            const result = await this.mongooseService.findOne(request_id);
-            return { success: "true", body: result };
-        } catch (err) {
-            return { success: "false", body: err };
+        if (!isIdValid(requestToFind)) {
+            throw httpError(404, "Request ID is invalid.");
         }
+        return this.mongooseService.findById(requestToFind).catch((error) => {
+            throw httpError(404, error.message);
+        });
     }
 
     async updateRequest(requestToUpdate, to_update) {
-        try {
-            const request_id = { id_: requestToUpdate };
-            const result = await this.mongooseService.update(
-                request_id,
-                to_update
-            );
-            return { success: "true", body: result };
-        } catch (err) {
-            return { success: "false", body: err };
+        if (!isIdValid(requestToUpdate)) {
+            throw httpError(404, "Request ID is invalid.");
         }
+        const request_id = { id_: requestToUpdate };
+        return this.mongooseService
+            .update(request_id, to_update)
+            .catch((error) => {
+                throw httpError(404, error.message);
+            });
     }
 
     async deleteRequest(requestToDelete) {
-        try {
-            const request_id = { id_: requestToDelete };
-            const result = await this.mongooseService.delete(request_id);
-            return { success: "true", body: result };
-        } catch (err) {
-            return { success: "false", body: err };
+        if (!isIdValid(requestToDelete)) {
+            throw httpError(404, "Request ID is invalid.");
         }
+        return this.mongooseService
+            .deleteById(requestToDelete)
+            .catch((error) => {
+                console.log("this was caught v2");
+                throw httpError(404, error.message);
+            });
     }
 
     async deleteAllRequests() {
-        try {
-            const result = await this.mongooseService.deleteAll();
-            return { success: "true", body: result };
-        } catch (err) {
-            return { success: "false", body: err };
-        }
+        return this.mongooseService.deleteAll();
     }
 }
 

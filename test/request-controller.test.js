@@ -27,9 +27,7 @@ describe("Testing the /readonline/requests path", () => {
                     res.should.have.status(400);
                     res.should.be.a("object");
                     res.body.should.have.property("message");
-                    res.body.message.should.be.eql(
-                        "Request was unable to be created."
-                    );
+                    res.body.message.should.be.eql("Request data is invalid.");
 
                     done();
                 });
@@ -48,12 +46,9 @@ describe("Testing the /readonline/requests path", () => {
                 .send(request)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    // res.body.should.be.a("object");
-                    // res.body.should.have.property("_id");
-                    // res.body.should.have.property("name");
-                    // res.body.should.have.property("cost");
-                    // res.body.should.have.property("type");
-                    res.body.should.have.property("message");
+                    res.body.should.have
+                        .property("message")
+                        .eql("Request was successfully created.");
 
                     done();
                 });
@@ -96,24 +91,24 @@ describe("Testing the /readonline/requests path", () => {
                     res.should.have.status(404);
                     res.body.should.have.a
                         .property("message")
-                        .eql("Request could not be found.");
+                        .eql("Could not find record.");
 
                     done();
                 });
         });
 
-        it("should GET the Request", (done) => {
+        it("it should GET the Request", (done) => {
             chai.request(server)
                 .get("/readonline/requests/" + request1)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body[0].should.be.a("object");
-                    res.body[0].should.have.property("_id");
-                    res.body[0].should.have.property("name").eql("My Book");
-                    res.body[0].should.have.property("datePublished");
-                    res.body[0].should.have.property("cost");
-                    res.body[0].should.have.property("type");
-                    res.body[0].should.have.property("requestingUser");
+                    res.body.should.be.a("object");
+                    res.body.should.have.property("_id");
+                    res.body.should.have.property("name").eql("My Book");
+                    res.body.should.have.property("datePublished");
+                    res.body.should.have.property("cost");
+                    res.body.should.have.property("type");
+                    res.body.should.have.property("requestingUser");
 
                     done();
                 });
@@ -142,40 +137,30 @@ describe("Testing the /readonline/requests path", () => {
                 .end((err, res) => {
                     res.should.have.status(200);
 
-                    res.body[0].should.be.a("object");
-                    res.body[0].should.have
+                    res.body.should.be.a("object");
+                    res.body.should.have
                         .property("name")
                         .eql("My new named Book");
                 });
         });
 
-        // it("failure to UPDATE should return a 404", (done) => {
-        //     let to_update = {
-        //         name: "My new named Book",
-        //     };
-        //     chai.request(server)
-        //         .put("/readonline/requests/" + fakeId)
-        //         .send(to_update)
-        //         .end((err, res) => {
-        //             res.should.have.status(404);
-        //             res.body.should.have.a
-        //                 .property("message")
-        //                 .eql("Request to update could not be found.");
+        it("failure to UPDATE should return a 404", (done) => {
+            let to_update = {
+                name: "My new named Book",
+            };
+            console.log("test started");
+            chai.request(server)
+                .put("/readonline/requests/" + fakeId)
+                .send(to_update)
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql("Could not find record.");
 
-        //             done();
-        //         });
-
-        //     chai.request(server)
-        //         .get("/readonline/requests/" + request1)
-        //         .end((err, res) => {
-        //             res.should.have.status(200);
-
-        //             res.body[0].should.be.a("object");
-        //             res.body[0].should.have
-        //                 .property("name")
-        //                 .eql("My new named Book");
-        //         });
-        // });
+                    done();
+                });
+        });
     });
 
     describe("DELETE /readonline/requests/" + request1, () => {
@@ -201,10 +186,10 @@ describe("Testing the /readonline/requests path", () => {
             chai.request(server)
                 .delete("/readonline/requests/" + fakeId)
                 .end((err, res) => {
-                    res.should.have.status(400);
+                    res.should.have.status(404);
                     res.body.should.have
                         .property("message")
-                        .eql("Request to be deleted could not be found.");
+                        .eql("Could not find record.");
 
                     done();
                 });

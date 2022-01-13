@@ -35,3 +35,9 @@ db.mongoose
     });
 
 module.exports = db;
+
+module.exports = {
+    getModel: (modelName) => {
+        return db.mongoose.model(modelName);
+    },
+};

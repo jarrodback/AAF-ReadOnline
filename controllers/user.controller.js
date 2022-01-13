@@ -40,11 +40,13 @@ exports.create = (req, res) => {
  * @param {Object} res The response returned
  */
 exports.findAll = (req, res) => {
+    console.log("inside finall");
     User.find()
         .then((data) => {
             res.send(data);
         })
         .catch((err) => {
+            console.log("ERROR:");
             res.status(500).send({
                 message:
                     err.message || "An error occurred while retrieving Users.",

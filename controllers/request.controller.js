@@ -13,22 +13,12 @@ exports.create = (req, res) => {
         .then((data) => {
             console.log("Request has been saved in the database: " + data);
 
-            if (data.success) {
-                res.status(200).send({
-                    message: "Request was successfully created.",
-                });
-            } else {
-                res.status(400).send({
-                    message: "Request was unable to be created.",
-                });
-            }
+            res.status(200).send({
+                message: "Request was successfully created.",
+            });
         })
         .catch((err) => {
-            res.status(500).send({
-                message:
-                    err.message ||
-                    "An error occurred while creating and saving the Request.",
-            });
+            res.status(err.status).send({ message: err.message });
         });
 
     //         db.users
@@ -57,7 +47,7 @@ exports.findAll = (req, res) => {
         .then((data) => {
             res.send(data);
         })
-        .catch(() => {
+        .catch((err) => {
             res.status(500).send({
                 message:
                     err.message ||
@@ -76,18 +66,10 @@ exports.findOne = (req, res) => {
     requestService
         .findRequest(req.params.id)
         .then((data) => {
-            if (data.success) {
-                res.send(data.body);
-            } else {
-                res.status(404).send();
-            }
+            res.send(data);
         })
-        .catch(() => {
-            res.status(500).send({
-                message:
-                    err.message ||
-                    "An error occurred while finding the Request.",
-            });
+        .catch((err) => {
+            res.status(err.status).send({ message: err.message });
         });
 };
 
@@ -99,21 +81,13 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     requestService
         .updateRequest(req.params.id, req.body)
-        .then((data) => {
-            if (data.success) {
-                res.status(200).send({
-                    message: "Request was successfully updated.",
-                });
-            } else {
-                res.status(400).send();
-            }
+        .then(() => {
+            res.status(200).send({
+                message: "Request was successfully updated.",
+            });
         })
         .catch((err) => {
-            res.status(500).send({
-                message:
-                    err.message ||
-                    "An error occurred while updating the Request.",
-            });
+            res.status(err.status).send({ message: err.message });
         });
 };
 
@@ -125,21 +99,13 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
     requestService
         .deleteRequest(req.params.id)
-        .then((data) => {
-            if (data.success) {
-                res.status(200).send({
-                    message: "Request was successfully deleted.",
-                });
-            } else {
-                res.status(400).send();
-            }
+        .then(() => {
+            res.status(200).send({
+                message: "Request was successfully deleted.",
+            });
         })
         .catch((err) => {
-            res.status(500).send({
-                message:
-                    err.message ||
-                    "An error occurred while deleteing the Request.",
-            });
+            res.status(err.status).send({ message: err.message });
         });
     //         db.users
     //             .updateOne(
@@ -167,14 +133,10 @@ exports.delete = (req, res) => {
 exports.deleteAll = (req, res) => {
     requestService
         .deleteAllRequests()
-        .then((data) => {
-            if (data.success) {
-                res.status(200).send({
-                    message: "Requests were successfully deleted.",
-                });
-            } else {
-                res.status(400).send();
-            }
+        .then(() => {
+            res.status(200).send({
+                message: "Requests were successfully deleted.",
+            });
         })
         .catch((err) => {
             res.status(500).send({

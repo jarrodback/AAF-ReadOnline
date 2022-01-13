@@ -8,25 +8,29 @@ class MongooseService {
         this.model = model;
     }
     async create(requestToCreate) {
-        return await this.model.create(requestToCreate);
+        return this.model.create(requestToCreate);
     }
     async findAll() {
         return this.model.find({});
     }
-    async findOne(recordToFind) {
+    async findById(recordToFind) {
         return this.model
-            .find({ recordToFind })
+            .findById(recordToFind)
             .orFail(() => new Error("Could not find record."));
     }
     async update(recordToUpdate, to_update) {
-        return await this.model.updateOne(recordToUpdate, to_update);
-        // .orFail(() => new Error("Could not update record."));
+        console.log(recordToUpdate, " : ", to_update);
+        return this.model
+            .updateOne(recordToUpdate, to_update)
+            .orFail(() => new Error("Could not find record."));
     }
-    async delete(recordToDelete) {
-        return await this.model.deleteOne(recordToDelete);
+    async deleteById(recordToDelete) {
+        return this.model
+            .findByIdAndDelete(recordToDelete)
+            .orFail(() => new Error("Could not find record."));
     }
     async deleteAll() {
-        return await this.model.deleteMany();
+        return this.model.deleteMany();
     }
 }
 
