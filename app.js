@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const createError = require("http-errors");
 
 var app = express();
 
@@ -41,8 +42,6 @@ app.use("/usermanagement", userRouter);
  * Error handling
  */
 // Catch a 404 error
-const createError = require("http-errors");
-
 app.use(function (req, res, next) {
     next(createError(404));
 });

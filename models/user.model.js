@@ -5,14 +5,13 @@ module.exports = (mongoose) => {
         mongoose.Schema({
             username: {
                 type: String,
-                required: true,
-                lowercase: true,
-                unique: true,
+                required: [true, "You must supply the user's username."],
+                minlength: [5, "Your username must be at least 5 letters."],
             },
             email: {
                 type: String,
-                required: true,
-                unique: true,
+                required: [true, "You must supply the user's email."],
+                unique: [true, "The email must be unique."],
             },
             requests: [
                 {
@@ -20,13 +19,18 @@ module.exports = (mongoose) => {
                     ref: "request",
                 },
             ],
-            // role: {
-            //     type: mongoose.Schema.Types.ObjectId,
-            //     ref: "role",
-            // },
+            role: {
+                type: String,
+                required: [true, "You must supply the user's role."],
+                enum: {
+                    values: ["User", "Employee", "Admin"],
+                    message:
+                        "{VALUE} is not valid. Must be either `User`, `Employee`, or `Admin`.",
+                },
+            },
             dateCreated: {
                 type: Date,
-                required: true,
+                required: [true, "You must supply the user's creation date."],
                 default: Date.now,
             },
         })

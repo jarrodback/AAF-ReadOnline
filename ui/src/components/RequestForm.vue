@@ -95,7 +95,6 @@ export default {
                     this.request.type !== "Audiobook") ||
                 this.request.datePublished === ""
             ) {
-                console.log(this.request);
                 this.errorsPresent = true;
             } else {
                 this.$emit("createOrUpdate", this.request);

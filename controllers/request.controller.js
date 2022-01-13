@@ -1,49 +1,27 @@
-const db = require("../database");
-const Request = db.requests;
+const RequestService = require("../services/RequestService.js");
+const requestService = new RequestService();
 
 /**
  * Create a new book Request and save to the database
  * @param {Object} req The request being sent
  * @param {Object} res The response returned
  */
+
 exports.create = (req, res) => {
-    // Check the request isn't empty
-    if (
-        !req.body.name ||
-        (req.body.type != "Book" && req.body.type != "Audiobook")
-    ) {
-        res.status(400).send({ message: "Invalid Request data." });
-        return;
-    }
-    // Create a Request model object
-    const request = new Request({
-        name: req.body.name,
-        datePublished: req.body.datePublished,
-        cost: req.body.cost,
-        author: req.body.author,
-        type: req.body.type,
-        requestingUser: "61dd56a297402ee89224efb2", //req.body.requestingUser,
-    });
+    requestService
+        .createRequest(req.body)
+        .then((data) => {
+            console.log("Request has been saved in the database: " + data);
 
-    // Save the request in the database
-    request
-        .save()
-        .then((bookData) => {
-            console.log("Request has been saved in the database: " + bookData);
-
-            // Update the user who submitted to the request to contain the request id
-            db.users
-                .findByIdAndUpdate(
-                    request.requestingUser,
-                    { $push: { requests: bookData._id } },
-                    { new: true, useFindAndModify: false }
-                )
-                // If found
-                .then((userData) => {
-                    console.log(`The updated user: ${userData}`);
-                    // Returning the new request
-                    res.send(bookData);
+            if (data.success) {
+                res.status(200).send({
+                    message: "Request was successfully created.",
                 });
+            } else {
+                res.status(400).send({
+                    message: "Request was unable to be created.",
+                });
+            }
         })
         .catch((err) => {
             res.status(500).send({
@@ -52,6 +30,19 @@ exports.create = (req, res) => {
                     "An error occurred while creating and saving the Request.",
             });
         });
+
+    //         db.users
+    //             .findByIdAndUpdate(
+    //                 request.requestingUser,
+    //                 { $push: { requests: bookData._id } },
+    //                 { new: true, useFindAndModify: false }
+    //             )
+    //             // If found
+    //             .then((userData) => {
+    //                 console.log(`The updated user: ${userData}`);
+    //                 res.send(bookData);
+    //             });
+    //     })
 };
 
 /**
@@ -60,19 +51,17 @@ exports.create = (req, res) => {
  * @param {Object} res The response returned
  */
 exports.findAll = (req, res) => {
-    // const userId = { _id: "61dd56a297402ee89224efb2" };
-
-    // Find all data in the request collection with no condition to find all
-    Request.find({})
+    // Find all data in the request collection with no condition to find al
+    requestService
+        .findAllRequests()
         .then((data) => {
-            // Return the data once found
             res.send(data);
         })
-        .catch((err) => {
+        .catch(() => {
             res.status(500).send({
                 message:
                     err.message ||
-                    "An error occurred while finding all Requests.",
+                    "An error occurred while finding the Request.",
             });
         });
 };
@@ -84,15 +73,16 @@ exports.findAll = (req, res) => {
  */
 exports.findOne = (req, res) => {
     // Get the request Id from the body
-    const requestId = { _id: req.params.id };
-
-    // Search the collection for the request ID
-    Request.find(requestId)
+    requestService
+        .findRequest(req.params.id)
         .then((data) => {
-            // Return the data once found
-            res.send(data);
+            if (data.success) {
+                res.send(data.body);
+            } else {
+                res.status(404).send();
+            }
         })
-        .catch((err) => {
+        .catch(() => {
             res.status(500).send({
                 message:
                     err.message ||
@@ -107,15 +97,16 @@ exports.findOne = (req, res) => {
  * @param {Object} res The response returned
  */
 exports.update = (req, res) => {
-    // Get the request Id and the update fields from the body
-    const requestId = { _id: req.params.id };
-    const update = req.body;
-
-    // Search the collection for the request ID and update the fields
-    Request.updateOne(requestId, update)
+    requestService
+        .updateRequest(req.params.id, req.body)
         .then((data) => {
-            // Return the data once found and updated
-            res.send(data);
+            if (data.success) {
+                res.status(200).send({
+                    message: "Request was successfully updated.",
+                });
+            } else {
+                res.status(400).send();
+            }
         })
         .catch((err) => {
             res.status(500).send({
@@ -132,31 +123,16 @@ exports.update = (req, res) => {
  * @param {Object} res The response returned
  */
 exports.delete = (req, res) => {
-    // Get the request Id from the body
-    const requestId = { _id: req.params.id };
-
-    // Search the collection for the request ID and delete it
-    Request.deleteOne(requestId)
+    requestService
+        .deleteRequest(req.params.id)
         .then((data) => {
-            // Return the data once found
-            db.users
-                .updateOne(
-                    { requests: req.params.id },
-                    {
-                        $pull: {
-                            requests: req.params.id,
-                        },
-                    }
-                )
-                .then(() => {})
-                .catch(() => {
-                    res.status(500).send({
-                        message:
-                            err.message ||
-                            "An error occurred while deleteing the Request from the User.",
-                    });
+            if (data.success) {
+                res.status(200).send({
+                    message: "Request was successfully deleted.",
                 });
-            res.send(data);
+            } else {
+                res.status(400).send();
+            }
         })
         .catch((err) => {
             res.status(500).send({
@@ -165,6 +141,22 @@ exports.delete = (req, res) => {
                     "An error occurred while deleteing the Request.",
             });
         });
+    //         db.users
+    //             .updateOne(
+    //                 { requests: req.params.id },
+    //                 {
+    //                     $pull: {
+    //                         requests: req.params.id,
+    //                     },
+    //                 }
+    //             )
+    //             .catch((err) => {
+    //                 res.status(500).send({
+    //                     message:
+    //                         err.message ||
+    //                         "An error occurred while deleteing the Request from the User.",
+    //                 });
+    //             });
 };
 
 /**
@@ -173,17 +165,22 @@ exports.delete = (req, res) => {
  * @param {Object} res The response returned
  */
 exports.deleteAll = (req, res) => {
-    // Search the collection and delete all
-    Request.deleteMany()
+    requestService
+        .deleteAllRequests()
         .then((data) => {
-            // Return the data once found
-            res.send(data);
+            if (data.success) {
+                res.status(200).send({
+                    message: "Requests were successfully deleted.",
+                });
+            } else {
+                res.status(400).send();
+            }
         })
         .catch((err) => {
             res.status(500).send({
                 message:
                     err.message ||
-                    "An error occurred while deleteing all Requests.",
+                    "An error occurred while deleteing the Requests.",
             });
         });
 };

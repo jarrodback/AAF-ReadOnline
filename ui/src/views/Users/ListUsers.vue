@@ -14,6 +14,7 @@
                     <th>Username</th>
                     <th>Email</th>
                     <th>Date Created</th>
+                    <th>Role</th>
                 </tr>
             </thead>
             <tr
@@ -23,6 +24,7 @@
                 <td>{{user.username}}</td>
                 <td>{{user.email}}</td>
                 <td>{{dateTruncated(user.dateCreated)}}</td>
+                <td>{{user.role}}</td>
                 <td><button
                         class="button-green"
                         v-on:click="edit(user)"

@@ -1,22 +1,22 @@
 <template>
     <div>
         <h1>New User</h1>
-        <request-form></request-form>
+        <user-form @createOrUpdate="createOrUpdate"></user-form>
     </div>
 </template>
  
 <script>
 import { api } from "../../helpers/helpers";
-import requestForm from "../../components/RequestForm.vue";
+import userForm from "../../components/UserForm.vue";
 
 export default {
     name: "new-user",
     components: {
-        "request-form": requestForm,
+        "user-form": userForm,
     },
     methods: {
-        createOrUpdate: async function (request) {
-            const res = await api.createRequest(request);
+        createOrUpdate: async function (user) {
+            const res = await api.createUser(user);
             if (res.success === true) this.flash("request created", "success");
             this.$router.push(`/users/`);
         },

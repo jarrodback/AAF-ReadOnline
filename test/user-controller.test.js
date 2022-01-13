@@ -29,12 +29,12 @@ describe("Testing the /usermanagement/users path", () => {
                 username: "user2",
                 email: "user2@my.shu.ac.uk",
                 requests: [],
+                role: "Admin",
             };
             chai.request(server)
                 .post("/usermanagement/users")
                 .send(request)
                 .end((err, res) => {
-                    console.log(res);
                     res.should.have.status(200);
                     res.body.should.be.a("object");
                     res.body.should.have.property("_id");
@@ -42,6 +42,7 @@ describe("Testing the /usermanagement/users path", () => {
                     res.body.should.have.property("email");
                     res.body.should.have.property("requests");
                     res.body.should.have.property("dateCreated");
+                    res.body.should.have.property("role");
 
                     done();
                 });
@@ -65,7 +66,7 @@ describe("Testing the /usermanagement/users path", () => {
     });
 
     describe("GET /usermanagement/users", () => {
-        it("should GET all the Users", (done) => {
+        it("it should GET all the Users", (done) => {
             chai.request(server)
                 .get("/usermanagement/users")
                 .end((err, res) => {
@@ -77,7 +78,7 @@ describe("Testing the /usermanagement/users path", () => {
                 });
         });
 
-        it("should GET the User", (done) => {
+        it("it should GET the User", (done) => {
             chai.request(server)
                 .get("/usermanagement/users/" + user1)
                 .end((err, res) => {
@@ -90,6 +91,7 @@ describe("Testing the /usermanagement/users path", () => {
                     res.body[0].should.have.property("email");
                     res.body[0].should.have.property("requests");
                     res.body[0].should.have.property("dateCreated");
+                    res.body[0].should.have.property("role");
 
                     done();
                 });

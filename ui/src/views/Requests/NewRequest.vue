@@ -2,6 +2,7 @@
     <div>
         <h1>New Request</h1>
         <request-form @createOrUpdate="createOrUpdate"></request-form>
+        <flash-message></flash-message>
     </div>
 </template>
  
@@ -16,9 +17,17 @@ export default {
     },
     methods: {
         createOrUpdate: async function (request) {
-            const res = await api.createRequest(request);
-            if (res.success === true) this.flash("request created", "success");
-            this.$router.push(`/requests/`);
+            api.createRequest(request)
+                .then(() => {
+                    console.log("flash?");
+                    this.flash("request created", "success");
+                    this.$router.push(`/requests/`);
+                })
+                .catch((err) => {
+                    console.log("err?");
+
+                    console.error("Failed to create request: ", err);
+                });
         },
     },
 };

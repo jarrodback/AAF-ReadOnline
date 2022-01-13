@@ -1,10 +1,11 @@
 import Vue from "vue";
+import VueFlashMessage from "vue-flash-message";
 import App from "./App.vue";
 import router from "./router";
 import "./styling/style.css";
 
 Vue.config.productionTip = false;
-
+Vue.use(VueFlashMessage);
 new Vue({
     router,
     render: (h) => h(App),

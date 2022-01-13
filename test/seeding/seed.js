@@ -11,6 +11,7 @@ const requests = [
         author: "My Author",
         type: "Book",
         requestingUser: "61dd56a297402ee89224efb2",
+        status: "Accepted",
     },
     {
         _id: "123456789122",
@@ -20,6 +21,7 @@ const requests = [
         author: "The author of the book",
         type: "Audiobook",
         requestingUser: "61dd56a297402ee89224efb2",
+        status: "Pending Review",
     },
 ];
 
@@ -29,13 +31,15 @@ const users = [
         username: "jarrodback",
         email: "b8043407@my.shu.ac.uk",
         requests: ["123456789122", "123456789121"],
+        role: "Admin",
         dateCreated: 946684800,
     },
     {
         _id: "987654321122",
-        username: "user1",
+        username: "usER1",
         email: "user1@my.shu.ac.uk",
         requests: [],
+        role: "User",
         dateCreated: Date.now(),
     },
 ];

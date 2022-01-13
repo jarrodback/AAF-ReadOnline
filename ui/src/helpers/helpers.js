@@ -18,8 +18,6 @@ const handleError =
     (fn) =>
     (...params) =>
         fn(...params).catch((error) => {
-            console.log("error caught");
-
             vm.flash(
                 `${error.response.status}: ${error.response.statusText}`,
                 "error"
@@ -41,6 +39,15 @@ export const api = {
         return res;
     }),
     createRequest: handleError(async (payload) => {
+        // axios
+        //     .post(BASE_REQUESTS_URL, payload)
+        //     .then((data) => {
+        //         return data;
+        //     })
+        //     .catch((err) => {
+        //         console.error("Failed to create request: ", err.message);
+        //     });
+
         const res = await axios.post(BASE_REQUESTS_URL, payload);
         return res.data;
     }),

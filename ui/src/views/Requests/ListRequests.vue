@@ -11,8 +11,10 @@
                     <th>Cost</th>
                     <th>Author</th>
                     <th>Date Published</th>
+                    <th>Date Created</th>
                     <th>Type</th>
                     <th>Requesting User</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tr
@@ -23,8 +25,10 @@
                 <td>{{request.cost}}</td>
                 <td>{{request.author}}</td>
                 <td>{{dateTruncated(request.datePublished)}}</td>
+                <td>{{dateTruncated(request.dateCreated)}}</td>
                 <td>{{request.type}}</td>
                 <td>{{request.requestingUser}}</td>
+                <td>{{request.status}}</td>
                 <td><button
                         class="button-green"
                         v-on:click="edit(request)"
@@ -71,7 +75,7 @@ export default {
                     this.getAllRequests();
                 })
                 .catch((err) => {
-                    console.error("Unable to retrieve requests: ", err);
+                    console.error("Unable to retrieve requests: ", err.message);
                 });
         },
         async getAllRequests() {
