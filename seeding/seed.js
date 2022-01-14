@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-mongoose.requests = require("../../models/request.model")(mongoose);
-mongoose.users = require("../../models/user.model")(mongoose);
+mongoose.requests = require("../models/request.model")(mongoose);
+mongoose.users = require("../models/user.model")(mongoose);
 
 const requests = [
     {

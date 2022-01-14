@@ -1,17 +1,17 @@
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-const { response } = require("../app");
-let server = require("../app");
+let server = require("../../../app");
 let should = chai.should();
 
 chai.use(chaiHttp);
 
 const request1 = "123456789121";
-const fakeId = 111111111111;
+const fakeId = "111111111111";
+const invalidId = "a";
 
 describe("Testing the /readonline/requests path", () => {
     describe("POST /readonline/requests", () => {
-        it("it should not POST a Request without all required fields", (done) => {
+        it("it should not create a Request without all required fields", (done) => {
             let request = {
                 name: "My Book",
                 datePublished: Date.now(),
@@ -20,6 +20,7 @@ describe("Testing the /readonline/requests path", () => {
                 type: "Invalid",
                 requestingUser: "987654321121",
             };
+
             chai.request(server)
                 .post("/readonline/requests")
                 .send(request)
@@ -33,7 +34,7 @@ describe("Testing the /readonline/requests path", () => {
                 });
         });
 
-        it("it should POST and create a Request", (done) => {
+        it("it should create a Request", (done) => {
             let request = {
                 name: "My Book",
                 cost: 40,
@@ -72,7 +73,7 @@ describe("Testing the /readonline/requests path", () => {
     });
 
     describe("GET /readonline/requests", () => {
-        it("should GET all the Requests", (done) => {
+        it("it should get all the Requests", (done) => {
             chai.request(server)
                 .get("/readonline/requests")
                 .end((err, res) => {
@@ -84,7 +85,7 @@ describe("Testing the /readonline/requests path", () => {
                 });
         });
 
-        it("should return 404 if no record was found", (done) => {
+        it("it should return 404 if no record was found", (done) => {
             chai.request(server)
                 .get("/readonline/requests/" + fakeId)
                 .end((err, res) => {
@@ -92,6 +93,19 @@ describe("Testing the /readonline/requests path", () => {
                     res.body.should.have.a
                         .property("message")
                         .eql("Could not find record.");
+
+                    done();
+                });
+        });
+
+        it("it should return 404 if Request Id was invalid", (done) => {
+            chai.request(server)
+                .get("/readonline/requests/" + invalidId)
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql("Request ID is invalid.");
 
                     done();
                 });
@@ -144,11 +158,10 @@ describe("Testing the /readonline/requests path", () => {
                 });
         });
 
-        it("failure to UPDATE should return a 404", (done) => {
+        it("if the Request to update isn't found it should return 404", (done) => {
             let to_update = {
                 name: "My new named Book",
             };
-            console.log("test started");
             chai.request(server)
                 .put("/readonline/requests/" + fakeId)
                 .send(to_update)
