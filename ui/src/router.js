@@ -8,6 +8,7 @@ import EditRequest from "./views/Requests/EditRequests.vue";
 
 import NewUser from "./views/Users/NewUser.vue";
 import ListUser from "./views/Users/ListUsers.vue";
+import Login from "./views/Auth/Login.vue";
 
 Vue.use(Router);
 
@@ -45,6 +46,11 @@ export default new Router({
             path: "/users/new",
             name: "new-user",
             component: NewUser,
+        },
+        {
+            path: "/users/signin",
+            name: "login-user",
+            component: Login,
         },
     ],
 });

@@ -41,6 +41,20 @@ class MongooseService {
     }
 
     /**
+     * Find a record by property in the database.
+     *
+     * @param {String} recordToFind The property to find.
+     * @returns {Object} The found record.
+     * @returns {Error} The record could not be found.
+     */
+    async findByProperty(recordToFind) {
+        console.log("looking for: ", recordToFind);
+        return this.model
+            .find(recordToFind)
+            .orFail(() => new Error("Could not find record."));
+    }
+
+    /**
      * Update a record by ID in the database.
      *
      * @param {String} recordToUpdate The ID to update.

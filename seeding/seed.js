@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 mongoose.requests = require("../models/request.model")(mongoose);
 mongoose.users = require("../models/user.model")(mongoose);
+const bcrypt = require("bcryptjs");
 
 const requests = [
     {
@@ -29,18 +30,29 @@ const users = [
     {
         _id: "987654321121",
         username: "jarrodback",
-        email: "b8043407@my.shu.ac.uk",
+        email: "test@test.com",
         requests: ["123456789122", "123456789121"],
+        password: bcrypt.hashSync("test1", 8),
         role: "Admin",
         dateCreated: 946684800,
     },
     {
+        _id: "987654321123",
+        username: "usER3",
+        email: "test3@test.com",
+        requests: [],
+        password: bcrypt.hashSync("test3", 8),
+        role: "Employee",
+        dateCreated: new Date(),
+    },
+    {
         _id: "987654321122",
         username: "usER1",
-        email: "user1@my.shu.ac.uk",
+        email: "test2@test.com",
         requests: [],
+        password: bcrypt.hashSync("test2", 8),
         role: "User",
-        dateCreated: Date.now(),
+        dateCreated: new Date(),
     },
 ];
 

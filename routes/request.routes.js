@@ -1,5 +1,7 @@
 var express = require("express");
 var router = express.Router();
+// Authenticate the request with the token.
+const { checkJwtToken, isAdmin } = require("../auth/authJwt");
 
 // Get the Request controller
 var requestController = require("../controllers/request.controller");
@@ -10,21 +12,26 @@ router.get("/", function (req, res) {
 });
 
 // Create a new Request
-router.post("/requests/", requestController.create);
+router.post("/requests/", checkJwtToken, requestController.create);
 
 // Retrieve all Requests
-router.get("/requests/", requestController.findAll);
+router.get("/requests/", checkJwtToken, requestController.findAll);
 
 // Retrieve a single Request with id
-router.get("/requests/:id", requestController.findOne);
+router.get("/requests/:id", checkJwtToken, requestController.findOne);
 
 // Update a Request with id
-router.put("/requests/:id", requestController.update);
+router.put("/requests/:id", checkJwtToken, requestController.update);
 
 // Delete a Request with id
-router.delete("/requests/:id", requestController.delete);
+router.delete("/requests/:id", checkJwtToken, requestController.delete);
 
 // Delete all Requests of the database
-router.delete("/requests/", requestController.deleteAll);
+router.delete(
+    "/requests/",
+    checkJwtToken,
+    isAdmin,
+    requestController.deleteAll
+);
 
 module.exports = router;

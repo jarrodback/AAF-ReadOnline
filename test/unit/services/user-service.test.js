@@ -13,9 +13,10 @@ describe("Testing User Service", () => {
         username: "username",
         email: "email",
         role: "Admin",
+        password: "password",
     };
 
-    it("createUser: should be successfully", (done) => {
+    it("createUser: should be successful", (done) => {
         const userService = new UserService();
         userService.mongooseService.create = sinon.stub();
         userService.createUser(user);
@@ -83,6 +84,16 @@ describe("Testing User Service", () => {
 
                 done();
             });
+    });
+    it("findUserByProperty: should be successful", (done) => {
+        const userService = new UserService();
+        userService.mongooseService.findByProperty = sinon.stub();
+        userService.findUserByProperty("_id", userId);
+
+        expect(userService.mongooseService.findByProperty.calledOnce).to.be
+            .true;
+
+        done();
     });
 
     it("updateUser: should be successful", (done) => {

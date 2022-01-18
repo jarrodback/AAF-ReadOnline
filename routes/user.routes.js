@@ -1,5 +1,8 @@
 var express = require("express");
 var router = express.Router();
+// Authenticate the request with the token.
+const { checkJwtToken } = require("../auth/authJwt");
+const { isAdmin } = require("../auth/authJwt");
 
 // Get the User controller
 var userController = require("../controllers/user.controller");
@@ -10,21 +13,21 @@ router.get("/", function (req, res) {
 });
 
 // Create a new user
-router.post("/users/", userController.create);
+router.post("/users/", checkJwtToken, isAdmin, userController.create);
 
 // Retrieve all users
-router.get("/users/", userController.findAll);
+router.get("/users/", checkJwtToken, isAdmin, userController.findAll);
 
 // Retrieve a single user with id
-router.get("/users/:id", userController.findOne);
+router.get("/users/:id", checkJwtToken, userController.findOne);
 
 // Update a user with id
-router.put("/users/:id", userController.update);
+router.put("/users/:id", checkJwtToken, userController.update);
 
 // Delete a user with id
-router.delete("/users/:id", userController.delete);
+router.delete("/users/:id", checkJwtToken, isAdmin, userController.delete);
 
 // Delete all users of the database
-router.delete("/users/", userController.deleteAll);
+router.delete("/users/", checkJwtToken, isAdmin, userController.deleteAll);
 
 module.exports = router;
