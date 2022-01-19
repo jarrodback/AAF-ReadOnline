@@ -10,19 +10,21 @@ const request1 = "123456789121";
 const fakeId = "111111111111";
 const invalidId = "a";
 
-var token;
-
+// var token;
+var Cookies;
 before(function (done) {
     chai.request(server)
         .post("/auth/login")
-        .set({ Authorization: `Bearer ${token}` })
+        //.set({ Authorization: `Bearer ${token}` })
         .send({
             email: "test@test.com",
             password: "test1",
         })
         .end((err, res) => {
-            token = res.body.token;
-
+            // token = res.body.token;
+            console.log("Loggined in: ", res.body.message);
+            Cookies = res.headers["set-cookie"].pop().split(";")[0];
+            console.log("coo1kies: ", Cookies);
             done();
         });
 });
@@ -41,7 +43,8 @@ describe("Testing the /readonline/requests path", () => {
 
             chai.request(server)
                 .post("/readonline/requests")
-                .set({ Authorization: `Bearer ${token}` })
+                .set("Cookie", Cookies)
+
                 .send(request)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -63,7 +66,8 @@ describe("Testing the /readonline/requests path", () => {
             };
             chai.request(server)
                 .post("/readonline/requests")
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .send(request)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -96,7 +100,8 @@ describe("Testing the /readonline/requests path", () => {
         it("it should get all the Requests", (done) => {
             chai.request(server)
                 .get("/readonline/requests")
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("array");
@@ -109,7 +114,8 @@ describe("Testing the /readonline/requests path", () => {
         it("it should return 404 if no record was found", (done) => {
             chai.request(server)
                 .get("/readonline/requests/" + fakeId)
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(404);
                     res.body.should.have.a
@@ -123,7 +129,8 @@ describe("Testing the /readonline/requests path", () => {
         it("it should return 404 if Request Id was invalid", (done) => {
             chai.request(server)
                 .get("/readonline/requests/" + invalidId)
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(404);
                     res.body.should.have.a
@@ -137,7 +144,8 @@ describe("Testing the /readonline/requests path", () => {
         it("it should GET the Request", (done) => {
             chai.request(server)
                 .get("/readonline/requests/" + request1)
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -160,7 +168,8 @@ describe("Testing the /readonline/requests path", () => {
             };
             chai.request(server)
                 .put("/readonline/requests/" + request1)
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .send(to_update)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -173,7 +182,8 @@ describe("Testing the /readonline/requests path", () => {
 
             chai.request(server)
                 .get("/readonline/requests/" + request1)
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(200);
 
@@ -190,7 +200,8 @@ describe("Testing the /readonline/requests path", () => {
             };
             chai.request(server)
                 .put("/readonline/requests/" + fakeId)
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .send(to_update)
                 .end((err, res) => {
                     res.should.have.status(404);
@@ -207,14 +218,16 @@ describe("Testing the /readonline/requests path", () => {
         it("it should delete a Request", (done) => {
             chai.request(server)
                 .delete("/readonline/requests/" + request1)
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(200);
                 });
 
             chai.request(server)
                 .get("/readonline/requests")
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("array");
@@ -227,7 +240,8 @@ describe("Testing the /readonline/requests path", () => {
         it("it should not delete a Request with an invalid id", (done) => {
             chai.request(server)
                 .delete("/readonline/requests/" + fakeId)
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(404);
                     res.body.should.have
@@ -241,7 +255,8 @@ describe("Testing the /readonline/requests path", () => {
         it("it should delete all Requests", (done) => {
             chai.request(server)
                 .delete("/readonline/requests/")
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.a
@@ -253,7 +268,8 @@ describe("Testing the /readonline/requests path", () => {
 
             chai.request(server)
                 .get("/readonline/requests/")
-                .set({ Authorization: `Bearer ${token}` })
+                //                .set({ Authorization: `Bearer ${token}` })
+
                 .end((err, res) => {
                     res.should.have.status(200);
 

@@ -27,90 +27,72 @@ const handleError =
 
 export const api = {
     login: handleError(async (payload) => {
-        const res = await axios.post(BASE_AUTH_URL, payload);
+        const res = await axios.post(BASE_AUTH_URL, payload, {
+            withCredentials: true,
+        });
         return res.data;
     }),
 
     getRequest: handleError(async (id) => {
         const res = await axios.get(BASE_REQUESTS_URL + id, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res.data;
     }),
 
     getRequests: handleError(async () => {
         const res = await axios.get(BASE_REQUESTS_URL, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res.data;
     }),
     deleteRequest: handleError((id) => {
         const res = axios.delete(BASE_REQUESTS_URL + id, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res;
     }),
     createRequest: handleError(async (payload) => {
         const res = await axios.post(BASE_REQUESTS_URL, payload, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res.data;
     }),
     updateRequest: handleError(async (payload) => {
         const res = await axios.put(BASE_REQUESTS_URL + payload._id, payload, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res.data;
     }),
 
     getUser: handleError(async (id) => {
         const res = await axios.get(BASE_USERS_URL + id, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res.data;
     }),
 
     getUsers: handleError(async () => {
         const res = await axios.get(BASE_USERS_URL, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res.data;
     }),
     deleteUser: handleError((id) => {
         const res = axios.delete(BASE_USERS_URL + id, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res;
     }),
     createUser: handleError(async (payload) => {
         const res = await axios.post(BASE_USERS_URL, payload, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res.data;
     }),
     updateUser: handleError(async (payload) => {
         const res = await axios.put(BASE_USERS_URL + payload._id, payload, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            withCredentials: true,
         });
         return res.data;
     }),

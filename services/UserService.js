@@ -158,6 +158,7 @@ class UserService {
                     password,
                     user.password
                 );
+                console.log("Password valid: ", passwordIsValid);
 
                 // Invalid password, return 401
                 if (!passwordIsValid) {
@@ -174,6 +175,9 @@ class UserService {
                         expiresIn: 3600, // 24 hours
                     }
                 );
+
+                console.log("set cookie: ", token);
+
                 return token;
             })
             .catch(() => {

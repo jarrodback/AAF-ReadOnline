@@ -10,9 +10,11 @@ exports.login = async (req, res) => {
     userService
         .login(req.body.email, req.body.password)
         .then((token) => {
+            req.session.token = token;
+            console.log("My cookie: ", token);
             res.status(200).send({
                 message: "Successfully logged in.",
-                token: token,
+                // token: token,
             });
         })
         .catch((error) => {
