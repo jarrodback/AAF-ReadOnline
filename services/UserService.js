@@ -150,7 +150,6 @@ class UserService {
     async login(email, password) {
         return this.findUserByEmail(email)
             .then((users) => {
-                console.log(users);
                 //Can only be 1 user returned as email is unique.
                 const user = users[0];
 
@@ -158,7 +157,6 @@ class UserService {
                     password,
                     user.password
                 );
-                console.log("Password valid: ", passwordIsValid);
 
                 // Invalid password, return 401
                 if (!passwordIsValid) {
@@ -175,8 +173,6 @@ class UserService {
                         expiresIn: 3600, // 24 hours
                     }
                 );
-
-                console.log("set cookie: ", token);
 
                 return token;
             })

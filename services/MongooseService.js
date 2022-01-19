@@ -48,7 +48,6 @@ class MongooseService {
      * @returns {Error} The record could not be found.
      */
     async findByProperty(recordToFind) {
-        console.log("looking for: ", recordToFind);
         return this.model
             .find(recordToFind)
             .orFail(() => new Error("Could not find record."));

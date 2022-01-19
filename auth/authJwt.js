@@ -3,19 +3,15 @@ const jwt = require("jsonwebtoken");
 
 // Check if token is valid
 checkJwtToken = (req, res, next) => {
-    // if (!req.headers.authorization) {
     if (!req.session || !req.session.token) {
-        console.log("no session");
         return res.status(401).send({
             message: "Unauthorized: No token provided.",
         });
     }
-    const token = req.session.token; //req.headers.authorization.replace("Bearer ", "");
-    console.log("TOken? ", token);
+    const token = req.session.token;
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
         if (err) {
-            console.log(err);
             return res.status(401).send({
                 message: "Unauthorized: Invalid token.",
             });
