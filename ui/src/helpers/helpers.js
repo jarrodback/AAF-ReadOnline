@@ -1,33 +1,40 @@
 import axios from "axios";
-import Vue from "vue";
-import VueFlashMessage from "vue-flash-message";
-import "vue-flash-message/dist/vue-flash-message.min.css";
+// import Vue from "vue";
+// import VueFlashMessage from "vue-flash-message";
+// import "vue-flash-message/dist/vue-flash-message.min.css";
 
-Vue.use(VueFlashMessage, {
-    messageOptions: {
-        timeout: 3000,
-        pauseOnInteract: true,
-    },
-});
+// Vue.use(VueFlashMessage, {
+//     messageOptions: {
+//         timeout: 3000,
+//         pauseOnInteract: true,
+//     },
+// });
 
 const BASE_REQUESTS_URL = "http://localhost:3050/readonline/requests/";
 const BASE_USERS_URL = "http://localhost:3050/usermanagement/users/";
-const BASE_AUTH_URL = "http://localhost:3050/auth/login/";
+const BASE_AUTH_URL = "http://localhost:3050/auth/";
 
-const vm = new Vue();
+// const vm = new Vue();
 const handleError =
     (fn) =>
     (...params) =>
-        fn(...params).catch((error) => {
-            vm.flash(
-                `${error.response.status}: ${error.response.statusText}`,
-                "error"
-            );
+        fn(...params).catch(() => {
+            // vm.flash(
+            //     `${error.response.status}: ${error.response.statusText}`,
+            //     "error"
+            // );
         });
 
 export const api = {
     login: handleError(async (payload) => {
-        const res = await axios.post(BASE_AUTH_URL, payload, {
+        const res = await axios.post(BASE_AUTH_URL + "login", payload, {
+            withCredentials: true,
+        });
+        return res.data;
+    }),
+
+    register: handleError(async (payload) => {
+        const res = await axios.post(BASE_AUTH_URL + "register", payload, {
             withCredentials: true,
         });
         return res.data;
@@ -40,12 +47,24 @@ export const api = {
         return res.data;
     }),
 
-    getRequests: handleError(async () => {
-        const res = await axios.get(BASE_REQUESTS_URL, {
+    getRequests: handleError(async (query) => {
+        var condition = "";
+        if (query) {
+            condition = query;
+        }
+        const res = await axios.get(BASE_REQUESTS_URL + condition, {
             withCredentials: true,
         });
         return res.data;
     }),
+
+    getRequestsForUser: handleError(async (id) => {
+        const res = await axios.get(BASE_REQUESTS_URL + "user/" + id, {
+            withCredentials: true,
+        });
+        return res.data;
+    }),
+
     deleteRequest: handleError((id) => {
         const res = axios.delete(BASE_REQUESTS_URL + id, {
             withCredentials: true,

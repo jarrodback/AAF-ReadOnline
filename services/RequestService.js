@@ -28,7 +28,6 @@ class RequestService {
 
         const request = {
             name: requestToCreate.name,
-            datePublished: requestToCreate.datePublished,
             cost: requestToCreate.cost,
             author: requestToCreate.author,
             type: requestToCreate.type,
@@ -65,6 +64,35 @@ class RequestService {
     }
 
     /**
+     *  Find a request by params
+     *
+     * @param {String} params The params to search for
+     * @returns {httpError} 200 If finding the Request is successful.
+     * @returns {httpError} 404 If no Request is found.
+     */
+    async findRequestByParams(params) {
+        return this.mongooseService.findByProperty(params).catch((error) => {
+            throw httpError(404, error.message);
+        });
+    }
+
+    /**
+     *  Find a request by property
+     *
+     * @param {String} property The property to filter for.
+     * @param {String} value The value to search against.
+     * @returns {httpError} 200 If finding the Requests is successful.
+     * @returns {httpError} 404 If no User is found.
+     */
+    async findRequestByProperty(property, value) {
+        return this.mongooseService
+            .findByProperty({ [property]: value })
+            .catch((error) => {
+                throw httpError(404, error.message);
+            });
+    }
+
+    /**
      *  Update a request.
      *
      * @param {String} requestToUpdate
@@ -76,6 +104,7 @@ class RequestService {
         if (!isIdValid(requestToUpdate)) {
             throw httpError(404, "Request ID is invalid.");
         }
+        console.log("Got request: ", to_update);
         return this.mongooseService
             .update(requestToUpdate, to_update)
             .catch((error) => {
@@ -120,9 +149,9 @@ function validateRequest(request) {
     if (
         !request ||
         !request.name ||
-        !request.cost ||
-        !request.author //||
-        // !request.requestingUser
+        !request.cost < 0 ||
+        !request.author ||
+        !request.requestingUser
     ) {
         return false;
     } else if (request.type != "Book" && request.type != "Audiobook") {

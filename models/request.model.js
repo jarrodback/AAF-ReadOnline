@@ -8,10 +8,6 @@ module.exports = (mongoose) => {
                 required: [true, "You must supply the name of the book."],
                 minlength: [1, "The book name must be at least 1 letter."],
             },
-
-            datePublished: {
-                type: Date,
-            },
             dateCreated: {
                 type: Date,
                 required: [
@@ -40,8 +36,7 @@ module.exports = (mongoose) => {
                 },
             },
             requestingUser: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "user",
+                type: String,
                 required: [true, "You must supply the requesting user."],
             },
             status: {
@@ -51,7 +46,7 @@ module.exports = (mongoose) => {
                     values: [
                         "Pending Review",
                         "In Review",
-                        "New Information Required",
+                        "Needs More Information",
                         "Accepted",
                         "Denied",
                     ],
@@ -59,6 +54,19 @@ module.exports = (mongoose) => {
                         "{VALUE} is not valid. You must supply a valid request status.",
                 },
                 default: "Pending Review",
+            },
+            reviewingUser: {
+                type: String,
+                default: "",
+            },
+            previousReviewer: {
+                type: String,
+            },
+            reviewComments: {
+                type: String,
+            },
+            additionalInformation: {
+                type: String,
             },
         })
     );

@@ -2,13 +2,14 @@ import Vue from "vue";
 import VueFlashMessage from "vue-flash-message";
 import App from "./App.vue";
 import router from "./router";
-// import "./styling/style.css";
-
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
-// Import Bootstrap an BootstrapVue CSS files (order is important)
+import "vue-flash-message/dist/vue-flash-message.min.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
+import VueCompositionAPI from "@vue/composition-api";
+import "@/assets/css/main.css";
 
+Vue.use(VueCompositionAPI);
 Vue.config.productionTip = false;
 Vue.use(VueFlashMessage);
 // Make BootstrapVue available throughout your project

@@ -1,27 +1,22 @@
 <template>
     <div>
         <h1>Login</h1>
-        <user-login @createOrUpdate="createOrUpdate"></user-login>
+        <login-form></login-form>
+        <b-link v-on:click="register">Register</b-link>
     </div>
 </template>
  
 <script>
-import { api } from "../../helpers/helpers";
-import UserLogin from "../../components/UserLogin.vue";
+import LoginForm from "../../components/LoginForm.vue";
 
 export default {
     name: "login-user",
     components: {
-        "user-login": UserLogin,
-        UserLogin,
+        "login-form": LoginForm,
     },
     methods: {
-        createOrUpdate: async function (user) {
-            api.login(user).then((res) => {
-                localStorage.setItem("token", res.token);
-            });
-
-            this.$router.push(`/users/`);
+        register() {
+            this.$router.push("/register");
         },
     },
 };

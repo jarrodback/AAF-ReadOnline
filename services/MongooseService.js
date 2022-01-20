@@ -43,13 +43,13 @@ class MongooseService {
     /**
      * Find a record by property in the database.
      *
-     * @param {String} recordToFind The property to find.
+     * @param {String} propertyToFind The property to find.
      * @returns {Object} The found record.
      * @returns {Error} The record could not be found.
      */
-    async findByProperty(recordToFind) {
+    async findByProperty(propertyToFind) {
         return this.model
-            .find(recordToFind)
+            .find(propertyToFind)
             .orFail(() => new Error("Could not find record."));
     }
 

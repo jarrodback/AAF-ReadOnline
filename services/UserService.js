@@ -31,7 +31,7 @@ class UserService {
             username: userToCreate.username,
             email: userToCreate.email,
             role: userToCreate.role,
-            password: userToCreate.password,
+            password: bcrypt.hashSync(userToCreate.password, 8),
         };
         return this.mongooseService.create(user).catch((error) => {
             throw httpError(404, error.message);
@@ -167,14 +167,24 @@ class UserService {
                 }
                 // Create token and store in the session cookie
                 const token = jwt.sign(
-                    { id: user._id, role: user.role, email: user.email },
+                    {
+                        id: user._id,
+                        role: user.role,
+                        email: user.email,
+                        username: user.username,
+                    },
                     process.env.TOKEN_SECRET,
                     {
                         expiresIn: 3600, // 24 hours
                     }
                 );
 
-                return token;
+                return {
+                    token: token,
+                    username: user.username,
+                    role: user.role,
+                    id: user._id,
+                };
             })
             .catch(() => {
                 throw httpError(400, "Your email or password is incorrect.");

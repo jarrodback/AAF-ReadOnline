@@ -1,14 +1,12 @@
 import Vue from "vue";
 import Router from "vue-router";
-
-import Main from "./components/Main.vue";
-import NewRequest from "./views/Requests/NewRequest.vue";
+import { isAuthenticated, isAdmin, isLoggedOut } from "./middleware/auth";
 import ListRequest from "./views/Requests/ListRequests.vue";
-import EditRequest from "./views/Requests/EditRequests.vue";
-
-import NewUser from "./views/Users/NewUser.vue";
-import ListUser from "./views/Users/ListUsers.vue";
 import Login from "./views/Auth/Login.vue";
+import Register from "./views/Auth/Register.vue";
+import NotFound from "./views/Error/NotFound.vue";
+import Forbidden from "./views/Error/Forbidden.vue";
+import AssignRequests from "./views/Employee/AssignRequests.vue";
 
 Vue.use(Router);
 
@@ -18,39 +16,36 @@ export default new Router({
     linkActiveClass: "active",
     routes: [
         {
-            path: "/",
-            component: Main,
+            path: "/login",
+            name: "login-user",
+            component: Login,
+            beforeEnter: isLoggedOut,
+        },
+        {
+            path: "/register",
+            name: "register-user",
+            component: Register,
+            beforeEnter: isLoggedOut,
         },
         {
             path: "/requests/",
             name: "requests",
             component: ListRequest,
+            beforeEnter: isAuthenticated,
         },
         {
-            path: "/requests/new/",
-            name: "new-request",
-            component: NewRequest,
+            path: "/requests/assign/",
+            name: "assign",
+            component: AssignRequests,
+            beforeEnter: isAdmin,
         },
         {
-            path: "/requests/edit/",
-            name: "edit-request",
-            component: EditRequest,
-            props: true,
+            path: "/forbidden",
+            component: Forbidden,
         },
         {
-            path: "/users/",
-            name: "users",
-            component: ListUser,
-        },
-        {
-            path: "/users/new",
-            name: "new-user",
-            component: NewUser,
-        },
-        {
-            path: "/users/signin",
-            name: "login-user",
-            component: Login,
+            path: "/*",
+            component: NotFound,
         },
     ],
 });

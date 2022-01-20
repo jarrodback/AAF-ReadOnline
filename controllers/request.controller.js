@@ -1,3 +1,4 @@
+const { param } = require("../routes/request.routes.js");
 const RequestService = require("../services/RequestService.js");
 const requestService = new RequestService();
 
@@ -41,19 +42,36 @@ exports.create = (req, res) => {
  * @param {Object} res The response returned
  */
 exports.findAll = (req, res) => {
-    // Find all data in the request collection with no condition to find al
-    requestService
-        .findAllRequests()
-        .then((data) => {
-            res.send(data);
-        })
-        .catch((err) => {
-            res.status(500).send({
-                message:
-                    err.message ||
-                    "An error occurred while finding the Request.",
+    const url = new URL(
+        req.protocol + "://" + req.get("host") + req.originalUrl
+    );
+    let params = new URLSearchParams(url.search);
+    if (params) {
+        params = Object.fromEntries(params);
+
+        requestService
+            .findRequestByParams(params)
+            .then((data) => {
+                res.send(data);
+            })
+            .catch((err) => {
+                res.status(err.status).send({
+                    message: err.message,
+                });
             });
-        });
+    } else {
+        // Find all data in the request collection with no condition to find al
+        requestService
+            .findAllRequests()
+            .then((data) => {
+                res.send(data);
+            })
+            .catch((err) => {
+                res.status(err.status).send({
+                    message: err.message,
+                });
+            });
+    }
 };
 
 /**
@@ -61,7 +79,7 @@ exports.findAll = (req, res) => {
  * @param {Object} req The request being sent
  * @param {Object} res The response returned
  */
-exports.findOne = (req, res) => {
+exports.findRequest = (req, res) => {
     // Get the request Id from the body
     requestService
         .findRequest(req.params.id)
@@ -81,7 +99,8 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     requestService
         .updateRequest(req.params.id, req.body)
-        .then(() => {
+        .then((data) => {
+            console.log("Updated: ", data);
             res.status(200).send({
                 message: "Request was successfully updated.",
             });

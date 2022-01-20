@@ -9,10 +9,14 @@ const userService = new UserService();
 exports.login = async (req, res) => {
     userService
         .login(req.body.email, req.body.password)
-        .then((token) => {
-            req.session.token = token;
+        .then((data) => {
+            req.session.token = data.token;
+            console.log();
             res.status(200).send({
                 message: "Successfully logged in.",
+                username: data.username,
+                role: data.role,
+                id: data.id,
             });
         })
         .catch((error) => {
@@ -36,4 +40,16 @@ exports.register = (req, res) => {
         .catch((error) => {
             res.status(error.status).send({ message: error.message });
         });
+};
+
+/**
+ * Logs the user out
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
+exports.logout = (req, res) => {
+    req.session = null;
+    res.status(200).send({
+        message: "User was successfully logged out.",
+    });
 };
