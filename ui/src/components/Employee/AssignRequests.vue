@@ -20,23 +20,33 @@
 </template>
 
 <script>
-import { api } from "../helpers/helpers.js";
-import { store } from "../store";
+import { api, notify } from "../../helpers/helpers.js";
+import { store } from "../../store";
 
+/**
+ * Component to show Employees the list of requests that need assigning.
+ */
 export default {
     name: "assign-requests",
 
+    /**
+     * When component is mounted, get all requests.
+     */
     async mounted() {
         this.getRequests();
     },
 
     data() {
         return {
+            // Store requests from API.
             requests: [],
         };
     },
 
     computed: {
+        /**
+         * Fields to show in the Assign Request table.
+         */
         fields: function () {
             return [
                 "name",
@@ -50,29 +60,37 @@ export default {
             ];
         },
 
+        /**
+         * The items to show in the table.
+         */
         requestItems: function () {
             return this.$data.requests;
         },
 
-        options: function () {
-            return ["Book", "Audiobook"];
-        },
-
+        /**
+         * If there are requests, show the table.
+         */
         areRequests() {
             return this.$data.requests && this.$data.requests.length > 0;
         },
     },
 
     methods: {
-        // Truncate Date type to show only the date.
+        /**
+         * Truncate date to remove time and timezone.
+         */
         dateTruncated: function (date) {
             return date.toString().split("T")[0];
         },
 
+        /**
+         * Send a request to the API to retrieve all requets that meet query param conditions.
+         */
         async getRequests() {
             const query = "?status=Pending Review&reviewingUser=";
             api.getRequests(query)
                 .then((results) => {
+                    // If successful, truncate the results and save them.
                     this.requests = results;
                     if (this.requests.length > 0) {
                         // Truncate the dates.
@@ -84,11 +102,19 @@ export default {
                     }
                 })
                 .catch(() => {
-                    // console.error("Failed to get requests: ", error);
-                    // No requests found.
+                    notify(
+                        this,
+                        "Failed to talk retrieve requests from server.",
+                        "error"
+                    );
                 });
         },
 
+        /**
+         * Show the Assign modal.
+         *
+         * @param {Object} request The request object.
+         */
         assign(request) {
             this.$bvModal
                 .msgBoxConfirm(
@@ -103,15 +129,29 @@ export default {
                 )
                 .then((value) => {
                     if (value) {
-                        this.assignRequest(request);
+                        this.assignRequest(request).then(() => {
+                            notify(
+                                this,
+                                "Successfully assigned request.",
+                                "darkenSuccess"
+                            );
+                        });
                     }
                 })
-                .catch((err) => {
-                    // An error occurred
-                    console.log(err);
+                .catch(() => {
+                    notify(
+                        this,
+                        "An error occurred while assigning the request. Try again.",
+                        "error"
+                    );
                 });
         },
 
+        /**
+         * Send a request to the API to change the reviewer on the request.
+         *
+         * @param {Object} request The request object.
+         */
         assignRequest(request) {
             const payload = {
                 _id: request._id,

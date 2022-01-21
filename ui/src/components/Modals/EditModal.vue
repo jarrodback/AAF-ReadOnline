@@ -101,15 +101,25 @@
 </template>
 
 <script>
-import { api } from "../../helpers/helpers.js";
+import { api, notify } from "../../helpers/helpers.js";
 
+/**
+ * Component to show the edit modal.
+ */
 export default {
     name: "edit-modal",
     computed: {
+        /**
+         * Display options for book type.
+         */
         options: function () {
             return ["Book", "Audiobook"];
         },
 
+        /**
+         * Check if name meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
         isNameValid() {
             if (this.editModal.name) {
                 return this.validName();
@@ -117,6 +127,10 @@ export default {
             return false;
         },
 
+        /**
+         * Check if author meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
         isAuthorValid() {
             if (this.editModal.author) {
                 return this.validAuthor();
@@ -124,6 +138,10 @@ export default {
             return false;
         },
 
+        /**
+         * Check if cost meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
         isCostValid() {
             if (this.editModal.cost) {
                 return this.validCost();
@@ -131,6 +149,10 @@ export default {
             return false;
         },
 
+        /**
+         * Check if additional information has been input.
+         * @return {Boolean} Whether the condition is true.
+         */
         isAdditionalInfoValid() {
             if (this.editModal.additionalInformation) {
                 return this.validAdditionalInfo();
@@ -138,6 +160,10 @@ export default {
             return false;
         },
 
+        /**
+         * Check if the form passes all validation.
+         * @return {Boolean} Whether the condition is true.
+         */
         isFormValid() {
             return this.isNameValid && this.isAuthorValid && this.isCostValid;
         },
@@ -151,37 +177,17 @@ export default {
     },
 
     methods: {
-        editRequest() {
-            let payload = { ...this.editModal };
-            payload.reviewingUser = payload.previousReviewer;
-            payload.status = "In Review";
-            api.updateRequest(payload)
-                .then(() => {
-                    this.$notify({
-                        message: "Successfully edited the request.",
-                        type: "darkenSuccess",
-                        top: true,
-                        right: true,
-                        showClose: true,
-                    });
-                    this.$emit("refreshRequests");
-                })
-                .catch(() => {
-                    this.$notify({
-                        message: "Failed to edit the request. Try again.",
-                        type: "error",
-                        top: true,
-                        right: true,
-                        showClose: true,
-                    });
-                });
-        },
-
+        /**
+         * Show the modal on the page.
+         */
         openEditModal(request) {
             this.editModal = { ...request };
             this.$refs["edit-modal"].show();
         },
 
+        /**
+         * On modal submit, check if validation passes.
+         */
         handleOk(event) {
             if (this.isFormValid) {
                 this.editRequest();
@@ -189,19 +195,65 @@ export default {
                 event.preventDefault();
             }
         },
+
+        /**
+         * Check if name follows validation rules.
+         * @returns {Boolean} Whether the condition is met
+         */
         validName() {
             return this.editModal.name.length > 0 ? true : false;
         },
+
+        /**
+         * Check if cost follows validation rules.
+         * @returns {Boolean} Whether the condition is met
+         */
         validCost() {
             return this.editModal.cost > -1 ? true : false;
         },
+
+        /**
+         * Check if author follows validation rules.
+         * @returns {Boolean} Whether the condition is met
+         */
         validAuthor() {
             return this.editModal.author.length > 0 ? true : false;
         },
+
+        /**
+         * Check if additional information follows validation rules.
+         * @returns {Boolean} Whether the condition is met
+         */
         validAdditionalInfo() {
             return this.editModal.additionalInformation.length > 0
                 ? true
                 : false;
+        },
+
+        /**
+         * Send a request to edit the Request.
+         */
+        editRequest() {
+            let payload = { ...this.editModal };
+            payload.reviewingUser = payload.previousReviewer;
+            payload.status = "In Review";
+            api.updateRequest(payload)
+                .then(() => {
+                    notify(
+                        this,
+                        "Successfully edited the request.",
+                        "darkenSuccess"
+                    );
+
+                    this.$emit("refreshRequests");
+                })
+                .catch(() => {
+                    notify(
+                        this,
+                        "Failed to edit the request. Try again.",
+                        "error"
+                    );
+                });
         },
     },
 };

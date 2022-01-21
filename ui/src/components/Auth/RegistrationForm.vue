@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { api } from "../../helpers/helpers.js";
+import { notify, api } from "../../helpers/helpers.js";
 /**
  * Component to display registration form. Sends API request to register supplied credentials.
  */
@@ -85,6 +85,9 @@ export default {
     },
 
     methods: {
+        /**
+         * On form submit, check if username is valid and then make call to register.
+         */
         onSubmit(event) {
             event.preventDefault();
 
@@ -92,20 +95,27 @@ export default {
                 this.register();
             }
         },
+
+        /**
+         * Send request to register an account.
+         */
         register() {
             api.register(this.registerForm)
                 .then(() => {
-                    this.$notify({
-                        message: "You successfully created an account.",
-                        type: "darkenSuccess",
-                        top: true,
-                        right: true,
-                        showClose: true,
-                    });
+                    // If successful, navigate back to login route.
+                    notify(
+                        this,
+                        "You successfully created an account.",
+                        "darkenSuccess"
+                    );
                     this.$router.push("/login");
                 })
-                .catch((error) => {
-                    console.error("Failed to login: ", error);
+                .catch(() => {
+                    notify(
+                        this,
+                        "Something went wrong while creating an account. Try again.",
+                        "error"
+                    );
                 });
         },
     },

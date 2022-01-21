@@ -138,3 +138,12 @@ export const api = {
         return res;
     }),
 };
+
+export const notify = (context, message, type, showClose = true) =>
+    context.$notify({
+        message: message,
+        type: type,
+        top: true,
+        right: true,
+        showClose: showClose,
+    });

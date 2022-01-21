@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import AssignRequest from "../../components/AssignRequests.vue";
+import AssignRequest from "../../components/Employee/AssignRequests.vue";
 
 export default {
     name: "requests",

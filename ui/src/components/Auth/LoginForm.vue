@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { api } from "../../helpers/helpers.js";
+import { api, notify } from "../../helpers/helpers.js";
 import { store } from "../../store";
 
 /**
@@ -78,13 +78,11 @@ export default {
                     this.$router.push("requests");
                 })
                 .catch(() => {
-                    this.$notify({
-                        message: "Your email or password is incorrect.",
-                        type: "error",
-                        top: true,
-                        right: true,
-                        showClose: true,
-                    });
+                    notify(
+                        this,
+                        "Your email or password is incorrect.",
+                        "error"
+                    );
                 });
         },
     },

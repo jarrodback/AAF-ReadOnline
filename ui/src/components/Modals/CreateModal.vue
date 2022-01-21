@@ -72,41 +72,71 @@
 </template>
 
 <script>
-import { api } from "../../helpers/helpers.js";
+import { api, notify } from "../../helpers/helpers.js";
 import { store } from "../../store.js";
 
+/**
+ * Component to show the create modal.
+ */
 export default {
     name: "create-modal",
 
     computed: {
+        /**
+         * Display options for book type.
+         */
         options: function () {
             return ["Book", "Audiobook"];
         },
 
+        /**
+         * Check if name meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
         isNameValid() {
             if (this.createModal.name) {
                 return this.validName();
             }
             return false;
         },
+
+        /**
+         * Check if author meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
         isAuthorValid() {
             if (this.createModal.author) {
                 return this.validAuthor();
             }
             return false;
         },
+
+        /**
+         * Check if cost meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
         isCostValid() {
             if (this.createModal.cost) {
                 return this.validCost();
             }
             return false;
         },
+
+        /**
+         * Check if type meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
         isTypeValid() {
             if (this.createModal.type) {
                 return this.validType();
             }
             return false;
         },
+
+        /**
+         * Check if the form passes all validation.
+         * @return {Boolean} Whether the condition is true.
+         */
         isFormValid() {
             return (
                 this.isNameValid &&
@@ -119,17 +149,25 @@ export default {
 
     data() {
         return {
+            // The mapped form data.
             createModal: {
+                // Always set requesting user to be the username of the logged in user.
                 requestingUser: store.getters.user.username,
             },
         };
     },
 
     methods: {
+        /**
+         * Show the modal on the page.
+         */
         openCreateModal() {
             this.$refs["create-modal"].show();
         },
 
+        /**
+         * On modal submit, check if validation passes.
+         */
         handleOk(event) {
             if (this.isFormValid) {
                 this.createRequest();
@@ -137,41 +175,63 @@ export default {
                 event.preventDefault();
             }
         },
+
+        /**
+         * Check if name follows validation rules.
+         * @returns {Boolean} Whether the condition is met
+         */
         validName() {
             return this.createModal.name.length > 0 ? true : false;
         },
+
+        /**
+         * Check if cost follows validation rules.
+         * @returns {Boolean} Whether the condition is met
+         */
         validCost() {
             return this.createModal.cost > -1 ? true : false;
         },
+
+        /**
+         * Check if author follows validation rules.
+         * @returns {Boolean} Whether the condition is met
+         */
         validAuthor() {
             return this.createModal.author.length > 0 ? true : false;
         },
+
+        /**
+         * Check if type follows validation rules.
+         * @returns {Boolean} Whether the condition is met
+         */
         validType() {
             return (
                 this.createModal.type == "Book" ||
                 this.createModal.type == "Audiobook"
             );
         },
+
+        /**
+         * Send a request to create the Request.
+         */
         createRequest() {
             api.createRequest(this.createModal)
                 .then(() => {
-                    this.$notify({
-                        message: "Successfully created a request.",
-                        type: "darkenSuccess",
-                        top: true,
-                        right: true,
-                        showClose: true,
-                    });
+                    // If successful, send an event to trigger the refresh of requests on other component.
+                    notify(
+                        this,
+                        "Successfully created a request.",
+                        "darkenSuccess"
+                    );
+
                     this.$emit("refreshRequests");
                 })
                 .catch(() => {
-                    this.$notify({
-                        message: "Failed to create a request. Try again.",
-                        type: "error",
-                        top: true,
-                        right: true,
-                        showClose: true,
-                    });
+                    notify(
+                        this,
+                        "Failed to create a request. Try again.",
+                        "error"
+                    );
                 })
                 .finally(() => {
                     this.createModal = {

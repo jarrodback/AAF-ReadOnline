@@ -34,7 +34,7 @@
                     >Begin Review</b-link>
                     <b-link
                         v-if="inReview(data.item)"
-                        v-on:click="approve(data.item)"
+                        v-on:click="openApproveModal(data.item)"
                     >Approve</b-link>
                 </template>
             </b-table>
@@ -87,42 +87,12 @@
 
             </b-form>
         </b-modal>
-
-        <b-modal
-            id="approve-request-modal"
-            title="Aprove Request"
-            ref="approve-modal"
-            @ok="handleApprove"
-            :okVariant="'success'"
-            :okTitle="'Approve'"
-        >
-            <b-form
-                ref="approveRequestForm"
-                @submit.stop.prevent="handleSubmit"
-            >
-                <b-form-group
-                    label="Calculate Offical Cost"
-                    label-for="cost-input"
-                    invalid-feedback="Cost is required"
-                >
-                    <b-form-input
-                        type="number"
-                        id="cost-input"
-                        v-model="infoModal.cost"
-                        :state="isCostValid"
-                    ></b-form-input>
-                </b-form-group>
-
-                <p>Note: If the cost is higher than the threshold the request will be sent for authorisation.</p>
-
-            </b-form>
-        </b-modal>
     </div>
 </template>
 
 <script>
-import { api } from "../helpers/helpers.js";
-import { store } from "../store";
+import { api } from "../../helpers/helpers.js";
+import { store } from "../../store";
 
 export default {
     name: "employee-requests",
@@ -166,9 +136,6 @@ export default {
         isCostValid() {
             return this.infoModal.cost >= 0;
         },
-        isCostBelowThreshold() {
-            return this.infoModal.cost <= 100;
-        },
     },
 
     data() {
@@ -209,18 +176,7 @@ export default {
                 event.preventDefault();
             }
         },
-        handleApprove(event) {
-            if (this.isCostValid) {
-                if (this.isCostBelowThreshold) {
-                    //approve
-                } else {
-                    //authorise
-                    this.needsAuthorisation();
-                }
-            } else {
-                event.preventDefault();
-            }
-        },
+
         openInfoModal(request) {
             this.infoModal = { ...request };
             this.$refs["info-modal"].show();
@@ -252,10 +208,10 @@ export default {
                 });
         },
 
-        approve(request) {
-            this.infoModal = { ...request };
-            this.$refs["approve-modal"].show();
+        openApproveModal(request) {
+            this.$emit("approveRequest", request);
         },
+
         needsMoreInformation() {
             const payload = {
                 _id: this.infoModal._id,
