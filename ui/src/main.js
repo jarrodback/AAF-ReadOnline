@@ -8,7 +8,24 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import VueCompositionAPI from "@vue/composition-api";
 import "@/assets/css/main.css";
+import VueNotification from "@mathieustan/vue-notification";
 
+Vue.use(VueNotification, {
+    theme: {
+        colors: {
+            success: "#54d861",
+            darkenSuccess: "#2d8e36",
+            info: "#5d6a89",
+            darkenInfo: "#535f7b",
+            warning: "#f8a623",
+            darkenWarning: "#f69a07",
+            error: "#cc0000",
+            darkenError: "#ff245f",
+            offline: "#ff4577",
+            darkenOffline: "#ff245f",
+        },
+    },
+});
 Vue.use(VueCompositionAPI);
 Vue.config.productionTip = false;
 Vue.use(VueFlashMessage);

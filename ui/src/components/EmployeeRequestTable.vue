@@ -13,13 +13,13 @@
             >
                 <template #cell(actions)="data">
                     <b-link
-                        v-if="isApproved(data.item)"
-                        v-on:click="openCostModal(data.item)"
-                    >Calculate Cost</b-link>
+                        v-if="isDeclined(data.item)"
+                        v-on:click="cancel(data.item)"
+                    >Cancel</b-link>
                     <b-link
-                        v-else-if="!inReview(data.item)"
-                        v-on:click="beginWorkOnRequest(data.item)"
-                    >Begin Review</b-link>
+                        v-if="isApproved(data.item)"
+                        v-on:click="purchase(data.item)"
+                    >Purchase</b-link>
                     <b-link
                         v-else-if="hasComments(data.item)"
                         v-on:click="openInfoModal(data.item)"
@@ -29,8 +29,12 @@
                         v-on:click="openInfoModal(data.item)"
                     >Needs More Information</b-link>
                     <b-link
+                        v-else-if="pendingReview(data.item)"
+                        v-on:click="beginWorkOnRequest(data.item)"
+                    >Begin Review</b-link>
+                    <b-link
                         v-if="inReview(data.item)"
-                        v-on:click="approveRequest(data.item)"
+                        v-on:click="approve(data.item)"
                     >Approve</b-link>
                 </template>
             </b-table>
@@ -85,28 +89,31 @@
         </b-modal>
 
         <b-modal
-            id="cost-request-modal"
-            title="Calculate Cost"
-            ref="cost-modal"
-            @ok="handleOk"
-            :okTitle="'Confirm'"
+            id="approve-request-modal"
+            title="Aprove Request"
+            ref="approve-modal"
+            @ok="handleApprove"
+            :okVariant="'success'"
+            :okTitle="'Approve'"
         >
             <b-form
-                ref="costRequestForm"
+                ref="approveRequestForm"
                 @submit.stop.prevent="handleSubmit"
             >
                 <b-form-group
-                    label="Cost"
+                    label="Calculate Offical Cost"
                     label-for="cost-input"
                     invalid-feedback="Cost is required"
                 >
                     <b-form-input
                         type="number"
                         id="cost-input"
-                        v-model="cost"
+                        v-model="infoModal.cost"
                         :state="isCostValid"
                     ></b-form-input>
                 </b-form-group>
+
+                <p>Note: If the cost is higher than the threshold the request will be sent for authorisation.</p>
 
             </b-form>
         </b-modal>
@@ -157,7 +164,10 @@ export default {
             return this.infoModal.additionalInformation;
         },
         isCostValid() {
-            return this.cost > 0;
+            return this.infoModal.cost >= 0;
+        },
+        isCostBelowThreshold() {
+            return this.infoModal.cost <= 100;
         },
     },
 
@@ -165,7 +175,6 @@ export default {
         return {
             requests: [],
             infoModal: {},
-            cost: "",
         };
     },
 
@@ -200,12 +209,21 @@ export default {
                 event.preventDefault();
             }
         },
+        handleApprove(event) {
+            if (this.isCostValid) {
+                if (this.isCostBelowThreshold) {
+                    //approve
+                } else {
+                    //authorise
+                    this.needsAuthorisation();
+                }
+            } else {
+                event.preventDefault();
+            }
+        },
         openInfoModal(request) {
             this.infoModal = { ...request };
             this.$refs["info-modal"].show();
-        },
-        openCostModal() {
-            this.$refs["cost-modal"].show();
         },
         beginWorkOnRequest(request) {
             this.$bvModal
@@ -234,31 +252,9 @@ export default {
                 });
         },
 
-        approveRequest(request) {
-            this.$bvModal
-                .msgBoxConfirm(
-                    "Are you sure you want to approve the request?",
-                    {
-                        title: "Approve Request",
-                        okVariant: "success",
-                        okTitle: "Yes",
-                        cancelTitle: "No",
-                        hideHeaderClose: true,
-                    }
-                )
-                .then((value) => {
-                    if (value) {
-                        const payload = {
-                            _id: request._id,
-                            status: "Approved",
-                        };
-                        this.updateRequest(payload);
-                    }
-                })
-                .catch((err) => {
-                    // An error occurred
-                    console.log(err);
-                });
+        approve(request) {
+            this.infoModal = { ...request };
+            this.$refs["approve-modal"].show();
         },
         needsMoreInformation() {
             const payload = {
@@ -281,26 +277,117 @@ export default {
                     console.log("Failed to update request: ", error);
                 });
         },
+        needsAuthorisation() {
+            const payload = {
+                _id: this.infoModal._id,
+                status: "Needs Authorisation",
+                cost: this.infoModal.cost,
+            };
+            this.updateRequest(payload);
+        },
 
         inReview(request) {
-            return request.status == "In Review";
+            return (
+                request.status !== "Pending Review" &&
+                !this.isDeclined(request) &&
+                request.status !== "Needs Authorisation" &&
+                request.status !== "Approved"
+            );
+        },
+
+        pendingReview(request) {
+            return request.status == "Pending Review";
         },
 
         hasComments(request) {
-            return request.additionalInformation;
+            return (
+                request.additionalInformation && request.status == "In Review"
+            );
         },
 
         isApproved(request) {
             return request.status == "Approved";
         },
+        isDeclined(request) {
+            return request.status == "Declined";
+        },
+        cancelRequest(id) {
+            api.deleteRequest(id)
+                .then(() => {
+                    this.getRequests();
+                })
+                .catch((error) => {
+                    console.error("Failed to delete request: ", error);
+                });
+            //Send user notification
+        },
 
-        // additionalInformationGiven() {
-        //     console.log(
-        //         "Checking: ",
-        //         this.infoModal.additionalInformation.length > 0
-        //     );
-        //     return this.infoModal.additionalInformation.length > 0;
-        // },
+        cancel(request) {
+            this.$bvModal
+                .msgBoxConfirm(
+                    "Are you sure you want to cancel the request for " +
+                        request.name +
+                        "?",
+                    {
+                        title: "Cancel request",
+                        // size: "sm",
+                        // buttonSize: "lg",
+                        okVariant: "danger",
+                        okTitle: "Yes",
+                        cancelTitle: "No",
+                        // centered: true,
+                        hideHeaderClose: true,
+                    }
+                )
+                .then((value) => {
+                    if (value) {
+                        this.cancelRequest(request._id);
+                        const payload = {
+                            message:
+                                "Your request for " +
+                                request.name +
+                                " has been declined.",
+                            username: request.requestingUser,
+                        };
+                        api.createNotification(payload);
+                    }
+                })
+                .catch((err) => {
+                    // An error occurred
+                    console.log(err);
+                });
+        },
+
+        purchase(request) {
+            this.$bvModal
+                .msgBoxConfirm(
+                    "Are you sure you want to purchase the request?",
+                    {
+                        title: "Purchase request",
+                        okVariant: "success",
+                        okTitle: "Yes",
+                        cancelTitle: "No",
+                        hideHeaderClose: true,
+                    }
+                )
+                .then((value) => {
+                    if (value) {
+                        this.cancelRequest(request._id);
+                        const payload = {
+                            message:
+                                "Your request for " +
+                                request.name +
+                                " has been approved and purchased.",
+                            username: request.requestingUser,
+                        };
+                        api.createNotification(payload);
+                    }
+                })
+                .catch((err) => {
+                    // An error occurred
+                    console.log(err);
+                });
+        },
     },
 };
 </script>

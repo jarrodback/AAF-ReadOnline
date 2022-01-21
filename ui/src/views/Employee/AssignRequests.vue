@@ -13,10 +13,5 @@ export default {
     components: {
         "assign-requests": AssignRequest,
     },
-    methods: {
-        refreshRequests() {
-            this.$refs.viewRequests.getRequests();
-        },
-    },
 };
 </script>

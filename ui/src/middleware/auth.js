@@ -1,5 +1,5 @@
 import { store } from "../store";
-const isAuthenticated = (to, from, next) => {
+export const isAuthenticated = (to, from, next) => {
     if (store.state.loggedIn) {
         next();
     } else {

@@ -1,11 +1,5 @@
   <template>
     <div>
-        <div>
-            <b-button
-                v-on:click="openCreateModal"
-                variant="success"
-            >Create</b-button>
-        </div>
         <b-modal
             id="create-request-modal"
             title="Create Request"
@@ -78,8 +72,8 @@
 </template>
 
 <script>
-import { api } from "../helpers/helpers.js";
-import { store } from "../store.js";
+import { api } from "../../helpers/helpers.js";
+import { store } from "../../store.js";
 
 export default {
     name: "create-modal",
@@ -161,10 +155,23 @@ export default {
         createRequest() {
             api.createRequest(this.createModal)
                 .then(() => {
+                    this.$notify({
+                        message: "Successfully created a request.",
+                        type: "darkenSuccess",
+                        top: true,
+                        right: true,
+                        showClose: true,
+                    });
                     this.$emit("refreshRequests");
                 })
-                .catch((error) => {
-                    console.error("Failed to create request: ", error);
+                .catch(() => {
+                    this.$notify({
+                        message: "Failed to create a request. Try again.",
+                        type: "error",
+                        top: true,
+                        right: true,
+                        showClose: true,
+                    });
                 })
                 .finally(() => {
                     this.createModal = {

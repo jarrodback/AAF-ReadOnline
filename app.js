@@ -27,6 +27,7 @@ app.use(
 var requestRouter = require("./routes/request.routes");
 var userRouter = require("./routes/user.routes");
 var authRouter = require("./routes/auth.routes");
+var notificationRouter = require("./routes/notification.routes");
 
 /**
  * View Engine setup
@@ -46,25 +47,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/readonline", requestRouter);
 app.use("/usermanagement", userRouter);
 app.use("/auth", authRouter);
-
-app.use(function (req, res, next) {
-    // res.header("Access-Control-Allow-Credentials", true);
-    // res.header("Access-Control-Allow-Origin", "*");
-    // res.header(
-    //     "Access-Control-Allow-Methods",
-    //     "GET,PUT,POST,DELETE,UPDATE,OPTIONS"
-    // );
-    // res.header(
-    //     "Access-Control-Allow-Headers",
-    //     "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept"
-    // );
-    // next();
-});
-
-/**
- * Parsing handling
- */
-// Parse requests of content-type - application/json and application/x-www-form-urlencoded
+app.use("/notify", notificationRouter);
 
 /**
  * Error handling

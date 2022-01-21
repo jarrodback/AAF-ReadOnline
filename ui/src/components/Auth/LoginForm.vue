@@ -43,33 +43,48 @@
 </template>
 
 <script>
-import { api } from "../helpers/helpers.js";
-import { store } from "../store";
+import { api } from "../../helpers/helpers.js";
+import { store } from "../../store";
+
+/**
+ * Component to display a login form. Sends a request to the API with credentials.
+ */
 export default {
     name: "login-form",
 
     data() {
         return {
+            // The mapped form data.
             loginForm: {},
         };
     },
 
     methods: {
+        /**
+         * On submitting of the form, send login request to API.
+         */
         onSubmit(event) {
             event.preventDefault();
             api.login(this.loginForm)
                 .then((value) => {
+                    // If successful, store returned user details and change route.
                     store.commit("setLoggedIn", true);
                     store.commit("setUser", {
-                        id: value.id,
-                        username: value.username,
-                        role: value.role,
+                        id: value.data.id,
+                        username: value.data.username,
+                        role: value.data.role,
                     });
 
                     this.$router.push("requests");
                 })
-                .catch((error) => {
-                    console.error("Failed to login: ", error);
+                .catch(() => {
+                    this.$notify({
+                        message: "Your email or password is incorrect.",
+                        type: "error",
+                        top: true,
+                        right: true,
+                        showClose: true,
+                    });
                 });
         },
     },

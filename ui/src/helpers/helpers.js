@@ -13,6 +13,7 @@ import axios from "axios";
 const BASE_REQUESTS_URL = "http://localhost:3050/readonline/requests/";
 const BASE_USERS_URL = "http://localhost:3050/usermanagement/users/";
 const BASE_AUTH_URL = "http://localhost:3050/auth/";
+const BASE_NOTIFY_URL = "http://localhost:3050/notify/notifications/";
 
 // const vm = new Vue();
 const handleError =
@@ -26,12 +27,11 @@ const handleError =
         });
 
 export const api = {
-    login: handleError(async (payload) => {
-        const res = await axios.post(BASE_AUTH_URL + "login", payload, {
+    login: async (payload) => {
+        return axios.post(BASE_AUTH_URL + "login", payload, {
             withCredentials: true,
         });
-        return res.data;
-    }),
+    },
 
     register: handleError(async (payload) => {
         const res = await axios.post(BASE_AUTH_URL + "register", payload, {
@@ -114,5 +114,27 @@ export const api = {
             withCredentials: true,
         });
         return res.data;
+    }),
+    createNotification: handleError(async (payload) => {
+        const res = await axios.post(BASE_NOTIFY_URL, payload, {
+            withCredentials: true,
+        });
+        return res.data;
+    }),
+    getNotifications: handleError(async (query) => {
+        var condition = "";
+        if (query) {
+            condition = query;
+        }
+        const res = await axios.get(BASE_NOTIFY_URL + condition, {
+            withCredentials: true,
+        });
+        return res.data;
+    }),
+    deleteNotification: handleError((id) => {
+        const res = axios.delete(BASE_NOTIFY_URL + id, {
+            withCredentials: true,
+        });
+        return res;
     }),
 };

@@ -58,19 +58,27 @@
 </template>
 
 <script>
-import { api } from "../helpers/helpers.js";
+import { api } from "../../helpers/helpers.js";
+/**
+ * Component to display registration form. Sends API request to register supplied credentials.
+ */
 export default {
     name: "register-form",
 
     data() {
         return {
             registerForm: {
+                // The mapped form data.
                 username: "",
             },
         };
     },
 
     computed: {
+        /**
+         * Check the username is at least 5 characters.
+         * @return {Boolean} Whether condition is true.
+         */
         validateUsername() {
             return this.registerForm.username.length > 4;
         },
@@ -87,6 +95,13 @@ export default {
         register() {
             api.register(this.registerForm)
                 .then(() => {
+                    this.$notify({
+                        message: "You successfully created an account.",
+                        type: "darkenSuccess",
+                        top: true,
+                        right: true,
+                        showClose: true,
+                    });
                     this.$router.push("/login");
                 })
                 .catch((error) => {

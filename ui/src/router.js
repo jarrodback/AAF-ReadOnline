@@ -1,12 +1,18 @@
 import Vue from "vue";
 import Router from "vue-router";
-import { isAuthenticated, isAdmin, isLoggedOut } from "./middleware/auth";
+import {
+    isAuthenticated,
+    isEmployee,
+    isAdmin,
+    isLoggedOut,
+} from "./middleware/auth";
 import ListRequest from "./views/Requests/ListRequests.vue";
 import Login from "./views/Auth/Login.vue";
 import Register from "./views/Auth/Register.vue";
 import NotFound from "./views/Error/NotFound.vue";
 import Forbidden from "./views/Error/Forbidden.vue";
 import AssignRequests from "./views/Employee/AssignRequests.vue";
+import AuthoriseRequests from "./views/Employee/AuthoriseRequests.vue";
 
 Vue.use(Router);
 
@@ -37,6 +43,12 @@ export default new Router({
             path: "/requests/assign/",
             name: "assign",
             component: AssignRequests,
+            beforeEnter: isEmployee,
+        },
+        {
+            path: "/requests/authorise/",
+            name: "authorise",
+            component: AuthoriseRequests,
             beforeEnter: isAdmin,
         },
         {

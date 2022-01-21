@@ -2,12 +2,13 @@
     <div>
         <h1>Login</h1>
         <login-form></login-form>
-        <b-link v-on:click="register">Register</b-link>
+        <p>If you don't have an account you can create one here: <b-link v-on:click="register">Register</b-link>
+        </p>
     </div>
 </template>
  
 <script>
-import LoginForm from "../../components/LoginForm.vue";
+import LoginForm from "../../components/Auth/LoginForm.vue";
 
 export default {
     name: "login-user",
