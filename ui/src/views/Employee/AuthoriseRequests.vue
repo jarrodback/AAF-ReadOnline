@@ -6,8 +6,11 @@
 </template>
 
 <script>
-import AuthoriseRequests from "../../components/AuthoriseRequests.vue";
+import AuthoriseRequests from "../../components/Admin/AuthoriseRequests.vue";
 
+/**
+ * View to control what the admin sees when authorising requests.
+ */
 export default {
     name: "requests",
     components: {

@@ -10,14 +10,23 @@
 </template>
 
 <script>
+/**
+ * View to control if a user navigates to a route that is invalid.
+ */
 export default {
     name: "NotFound",
 
+    /**
+     * On navigation, redirect the user after 5 seconds.
+     */
     created() {
         setTimeout(() => this.redirect(), 5000);
     },
 
     methods: {
+        /**
+         * Redirect the user to the previous page.
+         */
         redirect() {
             this.$router.back();
         },

@@ -40,15 +40,27 @@
 </template>
 
 <script>
-import { api } from "../helpers/helpers.js";
-import { store } from "../store";
+import { api } from "../../helpers/helpers.js";
+import { store } from "../../store";
 
+/**
+ * Component to show the user's requests.
+ */
 export default {
     name: "view-requests",
+
+    /**
+     * On mount, get and show all requests.
+     */
     async mounted() {
         this.getRequests();
     },
     computed: {
+        /**
+         * Specify the fields that should be shown on the table.
+         *
+         * @returns {[String]} The list of table headers.
+         */
         fields: function () {
             return [
                 "name",
@@ -61,10 +73,20 @@ export default {
             ];
         },
 
+        /**
+         * Specify the data that should be used for the table.
+         *
+         * @returns {[Object]} The list of requests.
+         */
         requestItems: function () {
             return this.$data.requests;
         },
 
+        /**
+         * Check if there are requests to show.
+         *
+         * @returns {Boolean} True if there are requests.
+         */
         areRequests() {
             return this.$data.requests && this.$data.requests.length > 0;
         },
@@ -72,18 +94,24 @@ export default {
 
     data() {
         return {
+            // The list of requests to display.
             requests: [],
         };
     },
 
     methods: {
-        // Truncate Date type to show only the date.
+        /**
+         * Truncate date to remove time and timezone.
+         *
+         * @returns {Date} The truncated date.
+         */
         dateTruncated: function (date) {
             return date.toString().split("T")[0];
         },
-        openCreateModal() {
-            this.$emit("createRequest");
-        },
+
+        /**
+         * Send a request to retrieve all Requests.
+         */
         async getRequests() {
             const query =
                 "?requestingUser=" +
@@ -106,6 +134,18 @@ export default {
                 });
         },
 
+        /**
+         * Show the modal to create the request.
+         */
+        openCreateModal() {
+            this.$emit("createRequest");
+        },
+
+        /**
+         * Send a request to cancel the Request.
+         *
+         * @param {String} id The request id to cancel.
+         */
         cancelRequest(id) {
             api.deleteRequest(id)
                 .then(() => {
@@ -129,6 +169,11 @@ export default {
                 });
         },
 
+        /**
+         * Show modal to confirm if request should be cancelled.
+         *
+         * @param {Object} request The request to check.
+         */
         cancel(request) {
             this.$bvModal
                 .msgBoxConfirm(
@@ -153,20 +198,35 @@ export default {
                     console.log(err);
                 });
         },
+
+        /**
+         * Show the modal to edit the request.
+         *
+         * @param {Object} request The request to edit.
+         */
         openEditModal(request) {
             this.$emit("editRequest", request);
         },
+
+        /**
+         * Check if the request can be cancelled.
+         *
+         * @param {String} status The current status of the request.
+         * @returns {Boolean} True if request can be cancelled.
+         */
         canCancel(status) {
             return status == "Pending Review";
         },
+
+        /**
+         * Check if the request can be editted.
+         *
+         * @param {String} status The current status of the request.
+         * @returns {Boolean} True if request can be editted.
+         */
         canEdit(status) {
             return status == "Needs More Information";
         },
     },
 };
 </script>
-
-<style>
-</style>
-
-

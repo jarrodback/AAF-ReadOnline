@@ -102,11 +102,7 @@ export default {
                     }
                 })
                 .catch(() => {
-                    notify(
-                        this,
-                        "Failed to talk retrieve requests from server.",
-                        "error"
-                    );
+                    // No requests to show.
                 });
         },
 

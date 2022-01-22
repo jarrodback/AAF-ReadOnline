@@ -8,11 +8,13 @@
 <script>
 import RegistrationForm from "../../components/Auth/RegistrationForm.vue";
 
+/**
+ * View to control what the user sees when registering in.
+ */
 export default {
     name: "register-user",
     components: {
         "register-form": RegistrationForm,
     },
-    methods: {},
 };
 </script>

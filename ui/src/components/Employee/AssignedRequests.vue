@@ -22,11 +22,11 @@
                     >Purchase</b-link>
                     <b-link
                         v-else-if="hasComments(data.item)"
-                        v-on:click="openInfoModal(data.item)"
+                        v-on:click="openReviewModal(data.item)"
                     >View Response</b-link>
                     <b-link
                         v-else-if="inReview(data.item)"
-                        v-on:click="openInfoModal(data.item)"
+                        v-on:click="openReviewModal(data.item)"
                     >Needs More Information</b-link>
                     <b-link
                         v-else-if="pendingReview(data.item)"
@@ -39,67 +39,32 @@
                 </template>
             </b-table>
         </div>
-        <b-modal
-            id="info-request-modal"
-            title="More Information Required"
-            ref="info-modal"
-            @ok="handleOk"
-            :okTitle="'Confirm'"
-        >
-            <b-form
-                ref="infoRequestForm"
-                @submit.stop.prevent="handleSubmit"
-            >
-                <p>Are you sure you want to set this request to 'Needs More Information'?</p>
-                <b-form-group
-                    label="Review Comments"
-                    label-for="comment-input"
-                    invalid-feedback="Comments are required"
-                >
-                    <b-form-textarea
-                        id="comment-input"
-                        v-model="infoModal.reviewComments"
-                        required
-                        placeholder="Enter comments..."
-                        rows="3"
-                        max-rows="6"
-                        :state="isCommentValid"
-                    ></b-form-textarea>
-                </b-form-group>
-
-                <b-form-group
-                    v-if="additionalInformationGiven"
-                    label="Additional Information"
-                    label-for="additional-comment-input"
-                    invalid-feedback="Additional information is required"
-                >
-                    <b-form-textarea
-                        v-if="additionalInformationGiven"
-                        readonly
-                        id="additional-input"
-                        v-model="infoModal.additionalInformation"
-                        required
-                        placeholder="Enter additional information..."
-                        rows="3"
-                        max-rows="6"
-                    ></b-form-textarea>
-                </b-form-group>
-
-            </b-form>
-        </b-modal>
     </div>
 </template>
 
 <script>
-import { api } from "../../helpers/helpers.js";
+import { api, notify } from "../../helpers/helpers.js";
 import { store } from "../../store";
 
+/**
+ * Component to show the list of assigned requests an Employee has.
+ */
 export default {
     name: "employee-requests",
+
+    /**
+     * On mount, get and display all requests.
+     */
     async mounted() {
         this.getRequests();
     },
+
     computed: {
+        /**
+         * Specify the fields that should be shown on the table.
+         *
+         * @returns {[String]} The list of table headers.
+         */
         fields: function () {
             return [
                 "name",
@@ -112,47 +77,49 @@ export default {
             ];
         },
 
+        /**
+         * Specify the data that should be used for the table.
+         *
+         * @returns {[Object]} The list of requests.
+         */
         requestItems: function () {
             return this.$data.requests;
         },
 
-        options: function () {
-            return ["Book", "Audiobook"];
-        },
-
+        /**
+         * Check if there are requests to show.
+         *
+         * @returns {Boolean} True if there are requests.
+         */
         areRequests() {
             return this.$data.requests && this.$data.requests.length > 0;
-        },
-
-        isCommentValid() {
-            if (this.infoModal.reviewComments) {
-                return this.infoModal.reviewComments.length > 0;
-            }
-            return false;
-        },
-        additionalInformationGiven() {
-            return this.infoModal.additionalInformation;
-        },
-        isCostValid() {
-            return this.infoModal.cost >= 0;
         },
     },
 
     data() {
         return {
+            // The list of requests to display.
             requests: [],
-            infoModal: {},
         };
     },
 
     methods: {
-        // Truncate Date type to show only the date.
+        /**
+         * Truncate date to remove time and timezone.
+         *
+         * @returns {Date} The truncated date.
+         */
         dateTruncated: function (date) {
             return date.toString().split("T")[0];
         },
 
+        /**
+         * Send a request to retrieve all Requests.
+         */
         async getRequests() {
+            // Query the data on the API using query params. Returns all data with reviewing user equal to username.
             const query = "?reviewingUser=" + store.getters.user.username;
+
             api.getRequests(query)
                 .then((results) => {
                     this.requests = results;
@@ -169,18 +136,21 @@ export default {
                     // No requests found.
                 });
         },
-        handleOk(event) {
-            if (this.isCommentValid) {
-                this.needsMoreInformation();
-            } else {
-                event.preventDefault();
-            }
+
+        /**
+         * Show the modal to review the request.
+         *
+         * @param {Object} request The request to view.
+         */
+        openReviewModal(request) {
+            this.$emit("reviewRequest", request);
         },
 
-        openInfoModal(request) {
-            this.infoModal = { ...request };
-            this.$refs["info-modal"].show();
-        },
+        /**
+         * Begin reviewing a request. Show modal to validate action.
+         *
+         * @param {Object} request The request to begin reviewing.
+         */
         beginWorkOnRequest(request) {
             this.$bvModal
                 .msgBoxConfirm(
@@ -203,45 +173,49 @@ export default {
                     }
                 })
                 .catch((err) => {
-                    // An error occurred
                     console.log(err);
                 });
         },
 
+        /**
+         * Show the modal to approve the request.
+         *
+         * @param {Object} request The request to approve.
+         */
         openApproveModal(request) {
             this.$emit("approveRequest", request);
         },
 
-        needsMoreInformation() {
-            const payload = {
-                _id: this.infoModal._id,
-                status: "Needs More Information",
-                reviewingUser: "",
-                previousReviewer: store.getters.user.username,
-                reviewComments: this.infoModal.reviewComments,
-            };
-            this.updateRequest(payload);
-        },
-
+        /**
+         * Send a request to update the Request.
+         *
+         * @param {Object} payload The updated request.
+         */
         updateRequest(payload) {
             api.updateRequest(payload)
                 .then(() => {
-                    this.infoModal = {};
+                    notify(
+                        this,
+                        "The request is now in review.",
+                        "darkenSuccess"
+                    );
                     this.getRequests();
                 })
-                .catch((error) => {
-                    console.log("Failed to update request: ", error);
+                .catch(() => {
+                    notify(
+                        this,
+                        "An error occurred while updating the request. Try again.",
+                        "error"
+                    );
                 });
         },
-        needsAuthorisation() {
-            const payload = {
-                _id: this.infoModal._id,
-                status: "Needs Authorisation",
-                cost: this.infoModal.cost,
-            };
-            this.updateRequest(payload);
-        },
 
+        /**
+         * Check if a review is in review.
+         *
+         * @param {Object} request The request to check.
+         * @returns {Boolean} True if request is in review.
+         */
         inReview(request) {
             return (
                 request.status !== "Pending Review" &&
@@ -251,33 +225,53 @@ export default {
             );
         },
 
+        /**
+         * Check if a review is pending review.
+         *
+         * @param {Object} request The request to check.
+         * @returns {Boolean} True if request is pending review.
+         */
         pendingReview(request) {
             return request.status == "Pending Review";
         },
 
+        /**
+         * Check if a review has recieved additional comments.
+         *
+         * @param {Object} request The request to check.
+         * @returns {Boolean} True if request has additional information.
+         */
         hasComments(request) {
             return (
                 request.additionalInformation && request.status == "In Review"
             );
         },
 
+        /**
+         * Check if a review is approved .
+         *
+         * @param {Object} request The request to check.
+         * @returns {Boolean} True if request is approved.
+         */
         isApproved(request) {
             return request.status == "Approved";
         },
+
+        /**
+         * Check if a review is denied.
+         *
+         * @param {Object} request The request to check.
+         * @returns {Boolean} True if request is denied.
+         */
         isDeclined(request) {
             return request.status == "Declined";
         },
-        cancelRequest(id) {
-            api.deleteRequest(id)
-                .then(() => {
-                    this.getRequests();
-                })
-                .catch((error) => {
-                    console.error("Failed to delete request: ", error);
-                });
-            //Send user notification
-        },
 
+        /**
+         * Show modal to confirm if request should be cancelled.
+         *
+         * @param {Object} request The request to check.
+         */
         cancel(request) {
             this.$bvModal
                 .msgBoxConfirm(
@@ -286,34 +280,60 @@ export default {
                         "?",
                     {
                         title: "Cancel request",
-                        // size: "sm",
-                        // buttonSize: "lg",
                         okVariant: "danger",
                         okTitle: "Yes",
                         cancelTitle: "No",
-                        // centered: true,
                         hideHeaderClose: true,
                     }
                 )
                 .then((value) => {
                     if (value) {
-                        this.cancelRequest(request._id);
-                        const payload = {
-                            message:
-                                "Your request for " +
-                                request.name +
-                                " has been declined.",
-                            username: request.requestingUser,
-                        };
-                        api.createNotification(payload);
+                        this.cancelRequest(request).then(() => {
+                            const payload = {
+                                message:
+                                    "Your request for " +
+                                    request.name +
+                                    " has been declined.",
+                                username: request.requestingUser,
+                            };
+                            notify(
+                                this,
+                                "Succesfully cancelled the request.",
+                                "darkenSuccess"
+                            );
+                            api.createNotification(payload);
+                        });
                     }
                 })
                 .catch((err) => {
-                    // An error occurred
                     console.log(err);
                 });
         },
 
+        /**
+         * Send a request to cancel the Request.
+         *
+         * @param {String} id The request id to cancel.
+         */
+        cancelRequest(request) {
+            api.deleteRequest(request._id)
+                .then(() => {
+                    this.getRequests();
+                })
+                .catch(() => {
+                    notify(
+                        this,
+                        "An error occurred while cancelling the request. Try again.",
+                        "error"
+                    );
+                });
+        },
+
+        /**
+         * Show modal to check if request should be purchased.
+         *
+         * @param {Object} request The request to check.
+         */
         purchase(request) {
             this.$bvModal
                 .msgBoxConfirm(
@@ -328,15 +348,21 @@ export default {
                 )
                 .then((value) => {
                     if (value) {
-                        this.cancelRequest(request._id);
-                        const payload = {
-                            message:
-                                "Your request for " +
-                                request.name +
-                                " has been approved and purchased.",
-                            username: request.requestingUser,
-                        };
-                        api.createNotification(payload);
+                        this.cancelRequest(request._id).then(() => {
+                            notify(
+                                this,
+                                "Succesfully purchased the request.",
+                                "darkenSuccess"
+                            );
+                            const payload = {
+                                message:
+                                    "Your request for " +
+                                    request.name +
+                                    " has been approved and purchased.",
+                                username: request.requestingUser,
+                            };
+                            api.createNotification(payload);
+                        });
                     }
                 })
                 .catch((err) => {
@@ -347,5 +373,3 @@ export default {
     },
 };
 </script>
-
-

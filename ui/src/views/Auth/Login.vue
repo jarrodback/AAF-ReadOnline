@@ -10,12 +10,20 @@
 <script>
 import LoginForm from "../../components/Auth/LoginForm.vue";
 
+/**
+ * View to control what the user sees when logging.
+ */
 export default {
     name: "login-user",
+
     components: {
         "login-form": LoginForm,
     },
+
     methods: {
+        /**
+         * Navigate the user to the register route.
+         */
         register() {
             this.$router.push("/register");
         },

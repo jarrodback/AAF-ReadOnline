@@ -20,7 +20,7 @@
                         type="text"
                         id="name-input"
                         required
-                        v-model="editModal.name"
+                        v-model="request.name"
                         :state="isNameValid"
                     ></b-form-input>
                 </b-form-group>
@@ -33,7 +33,7 @@
                     <b-form-input
                         type="number"
                         id="cost-input"
-                        v-model="editModal.cost"
+                        v-model="request.cost"
                         :state="isCostValid"
                     ></b-form-input>
                 </b-form-group>
@@ -46,7 +46,7 @@
                     <b-form-input
                         type="text"
                         id="author-input"
-                        v-model="editModal.author"
+                        v-model="request.author"
                         :state="isAuthorValid"
                     ></b-form-input>
                 </b-form-group>
@@ -58,7 +58,7 @@
                 >
                     <b-form-select
                         id="type-input"
-                        v-model="editModal.type"
+                        v-model="request.type"
                         :options="options"
                     >
                     </b-form-select>
@@ -71,7 +71,7 @@
                     <b-form-textarea
                         readonly
                         id="comment-input"
-                        v-model="editModal.reviewComments"
+                        v-model="request.reviewComments"
                         required
                         placeholder="Enter comments..."
                         rows="3"
@@ -86,7 +86,7 @@
                 >
                     <b-form-textarea
                         id="additional-input"
-                        v-model="editModal.additionalInformation"
+                        v-model="request.additionalInformation"
                         required
                         placeholder="Enter additional information..."
                         rows="3"
@@ -121,7 +121,7 @@ export default {
          * @return {Boolean} Whether the condition is true.
          */
         isNameValid() {
-            if (this.editModal.name) {
+            if (this.request.name) {
                 return this.validName();
             }
             return false;
@@ -132,7 +132,7 @@ export default {
          * @return {Boolean} Whether the condition is true.
          */
         isAuthorValid() {
-            if (this.editModal.author) {
+            if (this.request.author) {
                 return this.validAuthor();
             }
             return false;
@@ -143,7 +143,7 @@ export default {
          * @return {Boolean} Whether the condition is true.
          */
         isCostValid() {
-            if (this.editModal.cost) {
+            if (this.request.cost) {
                 return this.validCost();
             }
             return false;
@@ -154,7 +154,7 @@ export default {
          * @return {Boolean} Whether the condition is true.
          */
         isAdditionalInfoValid() {
-            if (this.editModal.additionalInformation) {
+            if (this.request.additionalInformation) {
                 return this.validAdditionalInfo();
             }
             return false;
@@ -171,8 +171,8 @@ export default {
 
     data() {
         return {
-            requests: [],
-            editModal: {},
+            // The mapped form data.
+            request: {},
         };
     },
 
@@ -181,7 +181,7 @@ export default {
          * Show the modal on the page.
          */
         openEditModal(request) {
-            this.editModal = { ...request };
+            this.request = { ...request };
             this.$refs["edit-modal"].show();
         },
 
@@ -201,7 +201,7 @@ export default {
          * @returns {Boolean} Whether the condition is met
          */
         validName() {
-            return this.editModal.name.length > 0 ? true : false;
+            return this.request.name.length > 0 ? true : false;
         },
 
         /**
@@ -209,7 +209,7 @@ export default {
          * @returns {Boolean} Whether the condition is met
          */
         validCost() {
-            return this.editModal.cost > -1 ? true : false;
+            return this.request.cost > -1 ? true : false;
         },
 
         /**
@@ -217,7 +217,7 @@ export default {
          * @returns {Boolean} Whether the condition is met
          */
         validAuthor() {
-            return this.editModal.author.length > 0 ? true : false;
+            return this.request.author.length > 0 ? true : false;
         },
 
         /**
@@ -225,16 +225,14 @@ export default {
          * @returns {Boolean} Whether the condition is met
          */
         validAdditionalInfo() {
-            return this.editModal.additionalInformation.length > 0
-                ? true
-                : false;
+            return this.request.additionalInformation.length > 0 ? true : false;
         },
 
         /**
          * Send a request to edit the Request.
          */
         editRequest() {
-            let payload = { ...this.editModal };
+            let payload = { ...this.request };
             payload.reviewingUser = payload.previousReviewer;
             payload.status = "In Review";
             api.updateRequest(payload)

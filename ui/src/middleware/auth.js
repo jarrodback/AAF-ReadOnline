@@ -1,4 +1,8 @@
 import { store } from "../store";
+
+/**
+ * Check if the user transitioning the route is logged in.
+ */
 export const isAuthenticated = (to, from, next) => {
     if (store.state.loggedIn) {
         next();
@@ -7,6 +11,9 @@ export const isAuthenticated = (to, from, next) => {
     }
 };
 
+/**
+ * Check if the user transitioning the route is an admin.
+ */
 export const isAdmin = (to, from, next) => {
     if (store.getters.user.role == "Admin") {
         next();
@@ -15,6 +22,9 @@ export const isAdmin = (to, from, next) => {
     }
 };
 
+/**
+ * Check if the user transitioning the route is an employee.
+ */
 export const isEmployee = (to, from, next) => {
     if (
         store.getters.user.role == "Admin" ||
@@ -26,6 +36,9 @@ export const isEmployee = (to, from, next) => {
     }
 };
 
+/**
+ * Check if the user transitioning the route is a user.
+ */
 export const isUser = (to, from, next) => {
     isAuthenticated(to, from, next);
     if (store.getters.user.role == "User") {
@@ -35,6 +48,9 @@ export const isUser = (to, from, next) => {
     }
 };
 
+/**
+ * Check if the user transitioning the route is logged in.
+ */
 export const isLoggedOut = (to, from, next) => {
     if (store.state.loggedIn) {
         next({ path: "/requests" });

@@ -8,6 +8,9 @@
 <script>
 import AssignRequest from "../../components/Employee/AssignRequests.vue";
 
+/**
+ * View to control what the employee sees when assigning requests..
+ */
 export default {
     name: "requests",
     components: {

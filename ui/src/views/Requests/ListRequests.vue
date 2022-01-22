@@ -23,59 +23,95 @@
             ref="approveModal"
         ></approve-modal>
 
-        <edit-modal
+        <review-modal
             @refreshAssignedRequests="refreshAssignedRequests"
-            ref="editAssignedModal"
-        ></edit-modal>
+            ref="reviewModal"
+        ></review-modal>
 
         <assigned-requests
             @approveRequest="approveRequest"
-            @editAssignedRequest="editAssignedRequest"
+            @reviewRequest="reviewRequest"
             ref="assignedRequests"
         ></assigned-requests>
     </div>
 </template>
 
 <script>
-import ViewRequests from "../../components/ViewRequests.vue";
+import ViewRequests from "../../components/User/ViewRequests.vue";
 import CreateModal from "../../components/Modals/CreateModal.vue";
 import EditModal from "../../components/Modals/EditModal.vue";
 import ApproveModal from "../../components/Modals/ApproveModal.vue";
+import ReviewModal from "../../components/Modals/ReviewModal.vue";
 import AssignedRequests from "../../components/Employee/AssignedRequests.vue";
 import { store } from "../../store";
 
+/**
+ * View to control what a user views when viewing their requests.
+ */
 export default {
     name: "requests",
+
     components: {
         "view-requests": ViewRequests,
         "create-modal": CreateModal,
         "edit-modal": EditModal,
         "approve-modal": ApproveModal,
         "assigned-requests": AssignedRequests,
+        "review-modal": ReviewModal,
     },
+
     computed: {
+        /**
+         * Check if the logged in user is a user.
+         *
+         * @returns {Boolean} True if the user is a user role.
+         */
         isUser() {
             return store.getters.user.role == "User";
         },
     },
+
     methods: {
+        /**
+         * Send an event request to refresh the requests.
+         */
         refreshRequests() {
             this.$refs.viewRequests.getRequests();
         },
+
+        /**
+         * Send an event request to refresh the requests for the assigned page.
+         */
         refreshAssignedRequests() {
             this.$refs.assignedRequests.getRequests();
         },
+
+        /**
+         * Send an event request to open the create modal.
+         */
         createRequest() {
             this.$refs.createModal.openCreateModal();
         },
+
+        /**
+         * Send an event request to open the edit modal.
+         */
         editRequest(request) {
             this.$refs.editModal.openEditModal(request);
         },
+
+        /**
+         * Send an event request to open the approve modal.
+         */
         approveRequest(request) {
             this.$refs.approveModal.openApproveModal(request);
         },
-        editAssignedRequest(request) {
-            this.$refs.editAssignedModal.openEditModal(request);
+
+        /**
+         * Send an event request to open the review modal.
+         */
+        reviewRequest(request) {
+            this.$refs.reviewModal.openReviewModal(request);
         },
     },
 };

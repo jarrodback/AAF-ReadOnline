@@ -14,47 +14,58 @@ import Forbidden from "./views/Error/Forbidden.vue";
 import AssignRequests from "./views/Employee/AssignRequests.vue";
 import AuthoriseRequests from "./views/Employee/AuthoriseRequests.vue";
 
+// Pass the router into Vue to use.
 Vue.use(Router);
 
+/**
+ * Define the router and the paths.
+ */
 export default new Router({
     mode: "history",
     base: process.env.BASE_URL,
     linkActiveClass: "active",
     routes: [
+        // Path to login page, must not be logged in.
         {
             path: "/login",
             name: "login-user",
             component: Login,
             beforeEnter: isLoggedOut,
         },
+        // Path to register page, must not be logged in.
         {
             path: "/register",
             name: "register-user",
             component: Register,
             beforeEnter: isLoggedOut,
         },
+        // Path to view the requests. Must be authenticated.
         {
             path: "/requests/",
             name: "requests",
             component: ListRequest,
             beforeEnter: isAuthenticated,
         },
+        // Path to view the requests to be assigned. Must be an employee.
         {
             path: "/requests/assign/",
             name: "assign",
             component: AssignRequests,
             beforeEnter: isEmployee,
         },
+        // Path to view the requests to be authorised. Must be an admin.
         {
             path: "/requests/authorise/",
             name: "authorise",
             component: AuthoriseRequests,
             beforeEnter: isAdmin,
         },
+        // If authentication fails, direct to Forbidden route.
         {
             path: "/forbidden",
             component: Forbidden,
         },
+        // If a router not specified is entered, show not found page.
         {
             path: "/*",
             component: NotFound,
