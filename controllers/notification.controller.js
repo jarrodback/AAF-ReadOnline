@@ -40,11 +40,7 @@ exports.findAll = (req, res) => {
                 res.send(data);
             })
             .catch((err) => {
-                res.status(500).send({
-                    message:
-                        err.message ||
-                        "An error occurred while finding the Notification.",
-                });
+                res.status(err.status).send({ message: err.message });
             });
     } else {
         res.status(404).send({

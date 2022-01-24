@@ -13,24 +13,8 @@
             >
                 <p>Are you sure you want to set this request to 'Needs More Information'?</p>
                 <b-form-group
-                    label="Review Comments"
-                    label-for="comment-input"
-                    invalid-feedback="Comments are required"
-                >
-                    <b-form-textarea
-                        id="comment-input"
-                        v-model="request.reviewComments"
-                        required
-                        placeholder="Enter comments..."
-                        rows="3"
-                        max-rows="6"
-                        :state="isCommentValid"
-                    ></b-form-textarea>
-                </b-form-group>
-
-                <b-form-group
                     v-if="additionalInformationGiven"
-                    label="Additional Information"
+                    label="Additional Information Provided"
                     label-for="additional-comment-input"
                     invalid-feedback="Additional information is required"
                 >
@@ -43,6 +27,22 @@
                         placeholder="Enter additional information..."
                         rows="3"
                         max-rows="6"
+                    ></b-form-textarea>
+                </b-form-group>
+
+                <b-form-group
+                    label="Review Comments"
+                    label-for="comment-input"
+                    invalid-feedback="Comments are required"
+                >
+                    <b-form-textarea
+                        id="comment-input"
+                        v-model="request.reviewComments"
+                        required
+                        placeholder="Enter comments..."
+                        rows="3"
+                        max-rows="6"
+                        :state="isCommentValid"
                     ></b-form-textarea>
                 </b-form-group>
 
@@ -106,6 +106,7 @@ export default {
          */
         openReviewModal(request) {
             this.request = { ...request };
+            this.request.reviewComments = "";
             this.$refs["review-modal"].show();
         },
 
@@ -119,7 +120,15 @@ export default {
                 reviewingUser: "",
                 previousReviewer: store.getters.user.username,
                 reviewComments: this.request.reviewComments,
+                history: this.request.history,
             };
+            payload.history.push({
+                time: Date.now(),
+                status: "Needs More Information",
+                modifyingUser: store.getters.user.username,
+                comments: payload.reviewComments,
+            });
+
             this.updateRequest(payload);
         },
 

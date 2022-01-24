@@ -20,6 +20,7 @@
     <div v-else>
         <approve-modal
             @refreshAssignedRequests="refreshAssignedRequests"
+            @purchaseRequest="purchaseRequest"
             ref="approveModal"
         ></approve-modal>
 
@@ -112,6 +113,13 @@ export default {
          */
         reviewRequest(request) {
             this.$refs.reviewModal.openReviewModal(request);
+        },
+
+        /**
+         * Send an event request to purchase the review.
+         */
+        purchaseRequest(request) {
+            this.$refs.assignedRequests.purchaseRequest(request);
         },
     },
 };

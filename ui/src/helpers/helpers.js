@@ -7,6 +7,7 @@ const BASE_REQUESTS_URL = "http://localhost:3050/readonline/requests/";
 const BASE_USERS_URL = "http://localhost:3050/usermanagement/users/";
 const BASE_AUTH_URL = "http://localhost:3050/auth/";
 const BASE_NOTIFY_URL = "http://localhost:3050/notify/notifications/";
+const BASE_CONFIG_URL = "http://localhost:3050/config/";
 
 /**
  * Object that holds every API request.
@@ -239,6 +240,35 @@ export const api = {
         });
         return res;
     },
+
+    /*********************************
+     *            Conifg             *
+     ********************************/
+
+    /**
+     * Send a request to get all config settings.
+     *
+     * @returns {Promise}
+     */
+    getConfigSettings: async () => {
+        const res = await axios.get(BASE_CONFIG_URL, {
+            withCredentials: true,
+        });
+        return res.data;
+    },
+
+    /**
+     * Send a request to update a config setting.
+     *
+     * @param {Object} payload The data of the config setting to update.
+     * @returns {Promise}
+     */
+    updateConfig: async (payload) => {
+        const res = await axios.put(BASE_CONFIG_URL, payload, {
+            withCredentials: true,
+        });
+        return res.data;
+    },
 };
 
 /**
@@ -257,3 +287,49 @@ export const notify = (context, message, type, showClose = true) =>
         right: true,
         showClose: showClose,
     });
+
+/**
+ * Filter the list using the users input.
+ *
+ * @param {String} searchQuery The query to filter by.
+ * @param {[Object]} listToFilter The list to filter.
+ *
+ * @returns {[Object]} The filtered list.
+ *
+ */
+export const filterList = (searchQuery, listToFilter) => {
+    if (searchQuery) {
+        return listToFilter.filter((request) => {
+            return (
+                request.name
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase()) ||
+                request.status.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        });
+    }
+    return listToFilter;
+};
+
+/**
+ * Filter the list using the users input.
+ *
+ * @param {String} searchQuery The query to filter by.
+ * @param {[Object]} listToFilter The list to filter.
+ *
+ * @returns {[Object]} The filtered list.
+ *
+ */
+export const filterUserList = (searchQuery, listToFilter) => {
+    if (searchQuery) {
+        return listToFilter.filter((request) => {
+            return (
+                request.username
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase()) ||
+                request.role.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        });
+    }
+    return listToFilter;
+};

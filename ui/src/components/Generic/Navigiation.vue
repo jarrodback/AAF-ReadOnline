@@ -25,11 +25,32 @@
                         href="#"
                     >Assign Requests</b-nav-item>
 
-                    <b-nav-item
+                    <b-nav-item-dropdown
                         v-if="isAdmin"
-                        v-on:click="goToAdminPage"
-                        href="#"
-                    >Authorise</b-nav-item>
+                        id="admin-dropdown"
+                        text="Admin"
+                    >
+                        <b-dropdown-item
+                            v-if="isAdmin"
+                            v-on:click="goToAdminPage"
+                            href="#"
+                        >Authorise</b-dropdown-item>
+                        <b-dropdown-divider></b-dropdown-divider>
+
+                        <b-dropdown-item
+                            v-if="isAdmin"
+                            v-on:click="goToManagePage"
+                            href="#"
+                        >Manage</b-dropdown-item>
+                        <b-dropdown-divider></b-dropdown-divider>
+
+                        <b-dropdown-item
+                            v-if="isAdmin"
+                            v-on:click="goToUserManagementPage"
+                            href="#"
+                        >User Management</b-dropdown-item>
+                    </b-nav-item-dropdown>
+
                 </b-navbar-nav>
 
                 <b-navbar-nav class="ml-auto">
@@ -38,26 +59,51 @@
                             <b-icon
                                 icon="bell-fill"
                                 aria-label="Notifications"
-                            ></b-icon>
+                            >
+                            </b-icon>
+                            <b-badge
+                                phill
+                                v-if="areNotifications"
+                                variant="danger"
+                            >{{notifications.length}}</b-badge>
                         </template>
-                        <p v-if="!areNotifications">No notifcations to show</p>
+
+                        <p
+                            style="padding:10px"
+                            v-if="!areNotifications"
+                        >No notifcations to show!</p>
                         <div
                             v-else
                             v-for="(notification, not) in notifications"
                             :key="not"
                         >
-                            <div class="center">
-                                <p>
+                            <b-badge variant="danger">NEW</b-badge>
+
+                            <div class="notification-body">
+                                <div class="notification-text">
                                     {{notification.message}}
+                                </div>
+                                <div class="icon h3">
                                     <b-icon
+                                        id="notification-dismiss"
                                         class="pointer"
                                         icon="x"
-                                        v-on:click="clear(notification._id)"
+                                        v-on:click="removeNotification(notification._id)"
                                         aria-label="Clear Notification"
                                     ></b-icon>
-                                </p>
-                                <b-dropdown-divider></b-dropdown-divider>
+                                    <b-tooltip
+                                        target="notification-dismiss"
+                                        triggers="hover"
+                                    >
+                                        Dismiss notification
+                                    </b-tooltip>
+
+                                </div>
+
                             </div>
+
+                            <b-dropdown-divider></b-dropdown-divider>
+
                         </div>
                     </b-nav-item-dropdown>
                     <b-nav-item-dropdown
@@ -88,7 +134,7 @@ export default {
     /**
      * On mount, check if user is logged in and get all notifications.
      */
-    async mounted() {
+    async created() {
         if (this.getLoggedIn) {
             this.getAllNotifications();
         }
@@ -99,6 +145,17 @@ export default {
             // The list of notifications.
             notifications: [],
         };
+    },
+
+    watch: {
+        /**
+         * Get user notifications when they log in.
+         */
+        getLoggedIn: function () {
+            if (this.getLoggedIn) {
+                this.getAllNotifications();
+            }
+        },
     },
 
     computed: {
@@ -164,7 +221,7 @@ export default {
          * @returns {Boolean} True if there are notifications to view.
          */
         areNotifications() {
-            return this.notifications;
+            return this.notifications.length > 0;
         },
     },
     methods: {
@@ -202,16 +259,31 @@ export default {
         },
 
         /**
+         * Navigate to the Manage page.
+         */
+        goToManagePage() {
+            this.$router.push("/manage").catch(() => {});
+        },
+
+        /**
+         * Navigate to the User Management page.
+         */
+        goToUserManagementPage() {
+            this.$router.push("/usermanagement").catch(() => {});
+        },
+
+        /**
          * Get all notifications for the user.
          */
         getAllNotifications() {
-            const query = "?username=" + store.getters.user.username;
+            const query = "?username=" + store.getters.user.id;
             api.getNotifications(query)
                 .then((result) => {
                     this.notifications = result;
                 })
-                .catch((err) => {
-                    console.error("Unable to get notifications: ", err);
+                .catch(() => {
+                    // No notifications to show.
+                    this.notifications = [];
                 });
         },
 
@@ -220,13 +292,13 @@ export default {
          *
          * @param {String} id The id of the notifiation.
          */
-        clear(id) {
+        removeNotification(id) {
             api.deleteNotification(id)
                 .then(() => {
                     this.getAllNotifications();
                 })
                 .catch((err) => {
-                    console.error("Unable to get notifications: ", err);
+                    console.error("Unable to delete notification: ", err);
                 });
         },
     },

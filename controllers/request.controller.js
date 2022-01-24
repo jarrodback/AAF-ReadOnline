@@ -11,8 +11,8 @@ const requestService = new RequestService();
 exports.create = (req, res) => {
     requestService
         .createRequest(req.body)
-        .then((data) => {
-            console.log("Request has been saved in the database: " + data);
+        .then(() => {
+            console.log("Request has been saved in the database.");
 
             res.status(200).send({
                 message: "Request was successfully created.",
@@ -21,19 +21,6 @@ exports.create = (req, res) => {
         .catch((err) => {
             res.status(err.status).send({ message: err.message });
         });
-
-    //         db.users
-    //             .findByIdAndUpdate(
-    //                 request.requestingUser,
-    //                 { $push: { requests: bookData._id } },
-    //                 { new: true, useFindAndModify: false }
-    //             )
-    //             // If found
-    //             .then((userData) => {
-    //                 console.log(`The updated user: ${userData}`);
-    //                 res.send(bookData);
-    //             });
-    //     })
 };
 
 /**
@@ -100,7 +87,6 @@ exports.update = (req, res) => {
     requestService
         .updateRequest(req.params.id, req.body)
         .then((data) => {
-            console.log("Updated: ", data);
             res.status(200).send({
                 message: "Request was successfully updated.",
             });
@@ -126,22 +112,6 @@ exports.delete = (req, res) => {
         .catch((err) => {
             res.status(err.status).send({ message: err.message });
         });
-    //         db.users
-    //             .updateOne(
-    //                 { requests: req.params.id },
-    //                 {
-    //                     $pull: {
-    //                         requests: req.params.id,
-    //                     },
-    //                 }
-    //             )
-    //             .catch((err) => {
-    //                 res.status(500).send({
-    //                     message:
-    //                         err.message ||
-    //                         "An error occurred while deleteing the Request from the User.",
-    //                 });
-    //             });
 };
 
 /**

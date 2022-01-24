@@ -11,7 +11,6 @@ exports.login = async (req, res) => {
         .login(req.body.email, req.body.password)
         .then((data) => {
             req.session.token = data.token;
-            console.log();
             res.status(200).send({
                 message: "Successfully logged in.",
                 username: data.username,

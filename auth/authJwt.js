@@ -39,7 +39,7 @@ isAdmin = (req, res, next) => {
 isEmployee = (req, res, next) => {
     const role = req.role;
 
-    if (role != "Admin" || role != "Employee") {
+    if (role != "Admin" && role != "Employee") {
         return res.status(403).send({
             message:
                 "Unauthorized: You not do have permission to view this page.",

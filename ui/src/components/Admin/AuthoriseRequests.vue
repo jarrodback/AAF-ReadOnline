@@ -4,24 +4,87 @@
             <h1>Authorise Requests</h1>
         </div>
         <div class="center">
+
+            <b-form-input
+                v-if="areRequests"
+                size="sm"
+                class="mr-sm-2 input"
+                placeholder="Search for requests"
+                v-model="searchQuery"
+            ></b-form-input>
+
             <p v-if="!areRequests">No requests need authorising.</p>
             <b-table
                 v-else
                 striped
-                :items="requestItems"
+                :items="filteredRequests"
                 :fields="fields"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                responsive="sm"
             >
                 <template #cell(actions)="data">
-                    <b-link @click="accept(data.item)">Authorise</b-link>
-                    <b-link @click="decline(data.item)">Decline</b-link>
+                    <b-button-group>
+                        <b-button
+                            variant="success"
+                            @click="accept(data.item)"
+                        >Authorise</b-button>
+                        <b-button
+                            variant="danger"
+                            @click="decline(data.item)"
+                        >Decline</b-button>
+                    </b-button-group>
                 </template>
+
+                <template #cell(Details)="data">
+                    <b-form-checkbox
+                        v-model="data.detailsShowing"
+                        @change="data.toggleDetails"
+                    >
+                        View History
+                    </b-form-checkbox>
+                </template>
+
+                <template #row-details="data">
+                    <b-card>
+                        <b-row class="mb-2">
+                            <b-col
+                                sm="3"
+                                class="text-sm-right"
+                            ><b>Reviewer:</b>
+                            </b-col>
+                            <b-col v-if="isReviewer(data.item)">{{ data.item.reviewingUser }}</b-col>
+                            <b-col v-else> N/A </b-col>
+                        </b-row>
+
+                        <b-row class="mb-2">
+                            <b-col
+                                sm="3"
+                                class="text-sm-right"
+                            ><b>History:</b></b-col>
+
+                            <b-col>
+                                <div
+                                    v-for="(history, hist) in data.item.history"
+                                    :key="hist"
+                                >
+                                    [ <b>{{timeTruncated(new Date(history.time))}}</b>]: {{history.modifyingUser}} set the request to {{history.status}}
+                                    <br>
+                                    <div v-if="history.comments"><b>Appended comments:</b> {{history.comments}}</div>
+                                </div>
+                            </b-col>
+                        </b-row>
+                    </b-card>
+                </template>
+
             </b-table>
         </div>
     </div>
 </template>
 
 <script>
-import { api, notify } from "../../helpers/helpers.js";
+import { api, notify, filterList } from "../../helpers/helpers.js";
+import { store } from "../../store";
 
 /**
  * Component to show the requests to be authorised.
@@ -40,6 +103,15 @@ export default {
         return {
             // The requests to show.
             requests: [],
+
+            // Store the user's query.
+            searchQuery: "",
+
+            // Default field to sort by.
+            sortBy: "dateCreated",
+
+            // Sort by descending by default.
+            sortDesc: false,
         };
     },
 
@@ -55,10 +127,11 @@ export default {
                 "author",
                 "cost",
                 "type",
-                "status",
-                "dateCreated",
+                { key: "status", sortable: true },
+                { key: "dateCreated", sortable: true },
                 "requestingUser",
                 "Actions",
+                "Details",
             ];
         },
 
@@ -78,6 +151,13 @@ export default {
          */
         areRequests() {
             return this.$data.requests && this.$data.requests.length > 0;
+        },
+
+        /**
+         * Filter the list of requests using the users search.
+         */
+        filteredRequests: function () {
+            return filterList(this.searchQuery, this.requests);
         },
     },
 
@@ -112,6 +192,7 @@ export default {
                 })
                 .catch(() => {
                     // No requests found.
+                    this.requests = [];
                 });
         },
 
@@ -152,7 +233,13 @@ export default {
             const payload = {
                 _id: request._id,
                 status: "Declined",
+                history: request.history,
             };
+            payload.history.push({
+                time: Date.now(),
+                status: "Declined",
+                modifyingUser: store.getters.user.username,
+            });
 
             notify(this, "Succesfully declined the request.", "darkenSuccess");
             this.updateRequest(payload);
@@ -195,7 +282,13 @@ export default {
             const payload = {
                 _id: request._id,
                 status: "Approved",
+                history: request.history,
             };
+            payload.history.push({
+                time: Date.now(),
+                status: "Approved",
+                modifyingUser: store.getters.user.username,
+            });
 
             notify(this, "Succesfully approved the request.", "darkenSuccess");
             this.updateRequest(payload);
@@ -211,13 +304,28 @@ export default {
                 .then(() => {
                     this.getRequests();
                 })
-                .catch(() => {
-                    notify(
-                        this,
-                        "An error occurred while updating the request. Try again.",
-                        "error"
-                    );
+                .catch((error) => {
+                    console.error(error);
                 });
+        },
+
+        /**
+         * Check if there is a reviewer for the request.
+         *
+         * @param {Object} request The request to check.
+         * @returns {Boolean} True if there are requests.
+         */
+        isReviewer(request) {
+            return request.reviewingUser;
+        },
+
+        /**
+         * Truncate time to remove time.
+         *
+         * @returns {Date} The truncated date.
+         */
+        timeTruncated: function (date) {
+            return date.toString().split("G")[0];
         },
     },
 };

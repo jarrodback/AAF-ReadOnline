@@ -16,18 +16,18 @@ router.get("/", function (req, res) {
 router.post("/users/", checkJwtToken, userController.create);
 
 // Retrieve all users
-router.get("/users/", checkJwtToken, userController.findAll);
+router.get("/users/", checkJwtToken, isAdmin, userController.findAll);
 
 // Retrieve a single user with id
-router.get("/users/:id", checkJwtToken, userController.findOne);
+router.get("/users/:id", checkJwtToken, isAdmin, userController.findOne);
 
 // Update a user with id
 router.put("/users/:id", checkJwtToken, userController.update);
 
 // Delete a user with id
-router.delete("/users/:id", checkJwtToken, userController.delete);
+router.delete("/users/:id", checkJwtToken, isAdmin, userController.delete);
 
 // Delete all users of the database
-router.delete("/users/", checkJwtToken, userController.deleteAll);
+router.delete("/users/", checkJwtToken, isAdmin, userController.deleteAll);
 
 module.exports = router;

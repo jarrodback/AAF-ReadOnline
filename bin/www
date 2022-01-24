@@ -20,6 +20,11 @@ app.set("port", port);
  */
 
 var server = http.createServer(app);
+const io = require("socket.io")(server, {
+    cors: {
+        origins: ["http://localhost:8080"],
+    },
+});
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -28,6 +33,28 @@ var server = http.createServer(app);
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
+
+io.on("connection", (socket) => {
+    socket.on("chat_join", function (data) {
+        console.log("inside chat join.");
+        this.username = data;
+        socket.emit("chat_join", data);
+    });
+
+    socket.on("chat_message", function (data) {
+        data.username = this.username;
+        socket.broadcast.emit("chat_message", data);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("user disconnected");
+    });
+
+    io.on("message", (msg) => {
+        console.log("Server got: ", msg);
+        socket.emit("broadcast", `SERVER:  ${msg}`);
+    });
+});
 
 /**
  * Normalize a port into a number, string, or false.

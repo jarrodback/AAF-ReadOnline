@@ -20,6 +20,7 @@ function setRunValidators() {
 db.requests = require("../models/request.model.js")(mongoose);
 db.users = require("../models/user.model.js")(mongoose);
 db.notifications = require("../models/notification.model.js")(mongoose);
+db.config = require("../models/config.model.js")(mongoose);
 
 // Using the mongoose object, start the database
 db.mongoose

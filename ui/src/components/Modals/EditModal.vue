@@ -35,6 +35,7 @@
                         id="cost-input"
                         v-model="request.cost"
                         :state="isCostValid"
+                        @keypress="validateNumber"
                     ></b-form-input>
                 </b-form-group>
 
@@ -102,6 +103,7 @@
 
 <script>
 import { api, notify } from "../../helpers/helpers.js";
+import { store } from "../../store";
 
 /**
  * Component to show the edit modal.
@@ -113,7 +115,7 @@ export default {
          * Display options for book type.
          */
         options: function () {
-            return ["Book", "Audiobook"];
+            return ["Book", "Audiobook", "Magazine"];
         },
 
         /**
@@ -182,6 +184,7 @@ export default {
          */
         openEditModal(request) {
             this.request = { ...request };
+            this.request.additionalInformation = "";
             this.$refs["edit-modal"].show();
         },
 
@@ -229,12 +232,34 @@ export default {
         },
 
         /**
+         * Restrict input to 2 decimal places.
+         *
+         * @param {Event} event The key press event.
+         */
+        validateNumber(event) {
+            if (
+                this.request.cost != null &&
+                this.request.cost.indexOf(".") > -1 &&
+                this.request.cost.split(".")[1].length > 1
+            ) {
+                event.preventDefault();
+            }
+        },
+
+        /**
          * Send a request to edit the Request.
          */
         editRequest() {
             let payload = { ...this.request };
             payload.reviewingUser = payload.previousReviewer;
             payload.status = "In Review";
+            payload.history.push({
+                time: Date.now(),
+                status: "In Review",
+                modifyingUser: store.getters.user.username,
+                comments: this.request.additionalInformation,
+            });
+
             api.updateRequest(payload)
                 .then(() => {
                     notify(

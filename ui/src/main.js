@@ -1,7 +1,7 @@
 import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
-
+import "../public/constants";
 /**
  * Import packages to aid with visuals.
  */
@@ -12,10 +12,10 @@ import VueNotification from "@mathieustan/vue-notification";
 /**
  * Import CSS style files.
  */
-import "@/assets/css/main.css";
 import "vue-flash-message/dist/vue-flash-message.min.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
+import "@/assets/css/main.css";
 
 /**
  * Configure and enable the packages to use with vue.

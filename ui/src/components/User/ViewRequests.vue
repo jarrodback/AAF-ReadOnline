@@ -3,12 +3,31 @@
         <div>
             <h1>My Requests</h1>
         </div>
-        <div class="center">
-            <b-button
-                class="createbutton"
-                v-on:click="openCreateModal"
-                variant="success"
-            >Create</b-button>
+        <div>
+            <div class="center search">
+                <b-button
+                    class="createbutton"
+                    v-on:click="openCreateModal"
+                    variant="success"
+                >Create</b-button>
+
+                <b-form-input
+                    v-if="areRequests"
+                    size="sm"
+                    class="mr-sm-2 input"
+                    placeholder="Search for requests"
+                    v-model="searchQuery"
+                ></b-form-input>
+
+                <b-form-checkbox
+                    class="input"
+                    id="view-completed"
+                    v-model="viewCompleted"
+                    name="checkbox-completed"
+                >
+                    View Completed Requests
+                </b-form-checkbox>
+            </div>
             <p
                 class=""
                 v-if="!areRequests"
@@ -21,26 +40,73 @@
             <b-table
                 v-if="areRequests"
                 striped
-                :items="requestItems"
+                :items="filteredRequests"
                 :fields="fields"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                responsive="sm"
             >
                 <template #cell(actions)="data">
-                    <b-link
+                    <b-button
+                        variant="info"
                         v-if="canEdit(data.item.status)"
                         @click="openEditModal(data.item)"
-                    >Edit</b-link>
-                    <b-link
+                    >Edit</b-button>
+                    <b-button
+                        variant="danger"
                         v-if="canCancel(data.item.status)"
                         @click="cancel(data.item)"
-                    >Cancel</b-link>
+                    >Cancel</b-button>
                 </template>
+
+                <template #cell(Details)="data">
+                    <b-form-checkbox
+                        v-model="data.detailsShowing"
+                        @change="data.toggleDetails"
+                    >
+                        View History
+                    </b-form-checkbox>
+                </template>
+
+                <template #row-details="data">
+                    <b-card>
+                        <b-row class="mb-2">
+                            <b-col
+                                sm="3"
+                                class="text-sm-right"
+                            ><b>Reviewer:</b>
+                            </b-col>
+                            <b-col v-if="isReviewer(data.item)">{{ data.item.reviewingUser }}</b-col>
+                            <b-col v-else> N/A </b-col>
+                        </b-row>
+
+                        <b-row class="mb-2">
+                            <b-col
+                                sm="3"
+                                class="text-sm-right"
+                            ><b>History:</b></b-col>
+
+                            <b-col>
+                                <div
+                                    v-for="(history, hist) in data.item.history"
+                                    :key="hist"
+                                >
+                                    [ <b>{{timeTruncated(new Date(history.time))}}</b>]: {{history.modifyingUser}} set the request to {{history.status}}
+                                    <br>
+                                    <div v-if="history.comments"><b>Appended comments:</b> {{history.comments}}</div>
+                                </div>
+                            </b-col>
+                        </b-row>
+                    </b-card>
+                </template>
+
             </b-table>
         </div>
     </div>
 </template>
 
 <script>
-import { api } from "../../helpers/helpers.js";
+import { api, filterList, notify } from "../../helpers/helpers.js";
 import { store } from "../../store";
 
 /**
@@ -67,9 +133,10 @@ export default {
                 "author",
                 "cost",
                 "type",
-                "status",
-                "dateCreated",
+                { key: "status", sortable: true },
+                { key: "dateCreated", sortable: true },
                 "Actions",
+                "Details",
             ];
         },
 
@@ -80,6 +147,26 @@ export default {
          */
         requestItems: function () {
             return this.$data.requests;
+        },
+
+        /**
+         * Filter the list of requests using the users search.
+         * If view completed is ticked, show purchased/declined requests.
+         */
+        filteredRequests: function () {
+            if (this.viewCompleted == true) {
+                return filterList(this.searchQuery, this.requests);
+            } else {
+                return filterList(
+                    this.searchQuery,
+                    this.requests.filter((request) => {
+                        return (
+                            request.status !== "Purchased" &&
+                            request.status !== "Declined"
+                        );
+                    })
+                );
+            }
         },
 
         /**
@@ -96,6 +183,18 @@ export default {
         return {
             // The list of requests to display.
             requests: [],
+
+            // The query to search requests with.
+            searchQuery: "",
+
+            // True if user wants to see purchased/declined requests.
+            viewCompleted: false,
+
+            // Default field to sort by.
+            sortBy: "dateCreated",
+
+            // Sort by descending by default.
+            sortDesc: false,
         };
     },
 
@@ -110,13 +209,20 @@ export default {
         },
 
         /**
+         * Truncate time to remove time.
+         *
+         * @returns {Date} The truncated date.
+         */
+        timeTruncated: function (date) {
+            return date.toString().split("G")[0];
+        },
+
+        /**
          * Send a request to retrieve all Requests.
          */
         async getRequests() {
             const query =
-                "?requestingUser=" +
-                store.getters.user.username +
-                "&reviewingUser=";
+                "?requestingUser=" + store.getters.user.id + "&reviewingUser=";
             api.getRequests(query)
                 .then((results) => {
                     this.requests = results;
@@ -131,6 +237,7 @@ export default {
                 })
                 .catch(() => {
                     // No requests found.
+                    this.requests = [];
                 });
         },
 
@@ -149,23 +256,19 @@ export default {
         cancelRequest(id) {
             api.deleteRequest(id)
                 .then(() => {
-                    this.$notify({
-                        message: "Successfully cancelled the request.",
-                        type: "darkenSuccess",
-                        top: true,
-                        right: true,
-                        showClose: true,
-                    });
+                    notify(
+                        this,
+                        "Successfully cancelled the request.",
+                        "darkenSuccess"
+                    );
                     this.getRequests();
                 })
                 .catch(() => {
-                    this.$notify({
-                        message: "Failed to cancel the request. Try again.",
-                        type: "error",
-                        top: true,
-                        right: true,
-                        showClose: true,
-                    });
+                    notify(
+                        this,
+                        "Failed to cancel the request. Refresh and try again.",
+                        "error"
+                    );
                 });
         },
 
@@ -226,6 +329,16 @@ export default {
          */
         canEdit(status) {
             return status == "Needs More Information";
+        },
+
+        /**
+         * Check if there is a reviewer for the request.
+         *
+         * @param {Object} request The request to check.
+         * @returns {Boolean} True if there are requests.
+         */
+        isReviewer(request) {
+            return request.reviewingUser;
         },
     },
 };

@@ -12,3 +12,19 @@ a{
 .createbutton {
     margin: 10px;
 }
+td{
+    vertical-align: middle !important;
+}
+.notification-body{
+    width: 200px !important;
+    display: flex;
+    padding: 15px;
+}
+.icon{
+    margin: auto;
+}
+.search{display:flex}
+.input{
+    margin:10px;
+    width: 15%;
+}

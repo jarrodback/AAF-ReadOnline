@@ -4,46 +4,109 @@
             <h1>Review Requests</h1>
         </div>
         <div class="center">
+
+            <b-form-input
+                v-if="areRequests"
+                size="sm"
+                class="mr-sm-2 input"
+                placeholder="Search for requests"
+                v-model="searchQuery"
+            ></b-form-input>
+
             <p v-if="!areRequests">No requests were found to review. Please assign yourself more!</p>
             <b-table
                 v-else
                 striped
-                :items="requestItems"
+                :items="filteredRequests"
                 :fields="fields"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                responsive="sm"
             >
                 <template #cell(actions)="data">
-                    <b-link
-                        v-if="isDeclined(data.item)"
-                        v-on:click="cancel(data.item)"
-                    >Cancel</b-link>
-                    <b-link
-                        v-if="isApproved(data.item)"
-                        v-on:click="purchase(data.item)"
-                    >Purchase</b-link>
-                    <b-link
-                        v-else-if="hasComments(data.item)"
-                        v-on:click="openReviewModal(data.item)"
-                    >View Response</b-link>
-                    <b-link
-                        v-else-if="inReview(data.item)"
-                        v-on:click="openReviewModal(data.item)"
-                    >Needs More Information</b-link>
-                    <b-link
-                        v-else-if="pendingReview(data.item)"
-                        v-on:click="beginWorkOnRequest(data.item)"
-                    >Begin Review</b-link>
-                    <b-link
-                        v-if="inReview(data.item)"
-                        v-on:click="openApproveModal(data.item)"
-                    >Approve</b-link>
+                    <b-button-group>
+                        <b-button
+                            variant="danger"
+                            v-if="isDeclined(data.item)"
+                            v-on:click="cancel(data.item)"
+                        >Cancel</b-button>
+                        <b-button
+                            variant="success"
+                            v-if="isApproved(data.item)"
+                            v-on:click="purchase(data.item)"
+                        >Purchase</b-button>
+                        <b-button
+                            variant="info"
+                            v-else-if="hasComments(data.item)"
+                            v-on:click="openReviewModal(data.item)"
+                        >View Response</b-button>
+                        <b-button
+                            variant="info"
+                            v-else-if="inReview(data.item)"
+                            v-on:click="openReviewModal(data.item)"
+                        >Needs More Information</b-button>
+                        <b-button
+                            variant="info"
+                            v-else-if="pendingReview(data.item)"
+                            v-on:click="beginWorkOnRequest(data.item)"
+                        >Review</b-button>
+                        <b-button
+                            variant="success"
+                            v-if="inReview(data.item)"
+                            v-on:click="openApproveModal(data.item)"
+                        >Approve</b-button>
+                    </b-button-group>
+
                 </template>
+
+                <template #cell(Details)="data">
+                    <b-form-checkbox
+                        v-model="data.detailsShowing"
+                        @change="data.toggleDetails"
+                    >
+                        View History
+                    </b-form-checkbox>
+                </template>
+
+                <template #row-details="data">
+                    <b-card>
+                        <b-row class="mb-2">
+                            <b-col
+                                sm="3"
+                                class="text-sm-right"
+                            ><b>Reviewer:</b>
+                            </b-col>
+                            <b-col v-if="isReviewer(data.item)">{{ data.item.reviewingUser }}</b-col>
+                            <b-col v-else> N/A </b-col>
+                        </b-row>
+
+                        <b-row class="mb-2">
+                            <b-col
+                                sm="3"
+                                class="text-sm-right"
+                            ><b>History:</b></b-col>
+
+                            <b-col>
+                                <div
+                                    v-for="(history, hist) in data.item.history"
+                                    :key="hist"
+                                >
+                                    [ <b>{{timeTruncated(new Date(history.time))}}</b>]: {{history.modifyingUser}} set the request to {{history.status}}
+                                    <br>
+                                    <div v-if="history.comments"><b>Appended comments:</b> {{history.comments}}</div>
+                                </div>
+                            </b-col>
+                        </b-row>
+                    </b-card>
+                </template>
+
             </b-table>
         </div>
     </div>
 </template>
 
 <script>
-import { api, notify } from "../../helpers/helpers.js";
+import { api, notify, filterList } from "../../helpers/helpers.js";
 import { store } from "../../store";
 
 /**
@@ -71,9 +134,10 @@ export default {
                 "author",
                 "cost",
                 "type",
-                "status",
-                "dateCreated",
+                { key: "status", sortable: true },
+                { key: "dateCreated", sortable: true },
                 "Actions",
+                "Details",
             ];
         },
 
@@ -94,12 +158,28 @@ export default {
         areRequests() {
             return this.$data.requests && this.$data.requests.length > 0;
         },
+
+        /**
+         * Filter the list of requests using the users search.
+         */
+        filteredRequests: function () {
+            return filterList(this.searchQuery, this.requests);
+        },
     },
 
     data() {
         return {
             // The list of requests to display.
             requests: [],
+
+            // Store the user's query.
+            searchQuery: "",
+
+            // Default field to sort by.
+            sortBy: "dateCreated",
+
+            // Sort by descending by default.
+            sortDesc: false,
         };
     },
 
@@ -118,7 +198,7 @@ export default {
          */
         async getRequests() {
             // Query the data on the API using query params. Returns all data with reviewing user equal to username.
-            const query = "?reviewingUser=" + store.getters.user.username;
+            const query = "?reviewingUser=" + store.getters.user.id;
 
             api.getRequests(query)
                 .then((results) => {
@@ -134,6 +214,7 @@ export default {
                 })
                 .catch(() => {
                     // No requests found.
+                    this.requests = [];
                 });
         },
 
@@ -168,8 +249,18 @@ export default {
                         const payload = {
                             _id: request._id,
                             status: "In Review",
+                            history: request.history,
                         };
-                        this.updateRequest(payload);
+                        payload.history.push({
+                            time: Date.now(),
+                            status: "In Review",
+                            modifyingUser: store.getters.user.username,
+                        });
+
+                        this.updateRequest(
+                            payload,
+                            "The request is now in review."
+                        );
                     }
                 })
                 .catch((err) => {
@@ -190,15 +281,12 @@ export default {
          * Send a request to update the Request.
          *
          * @param {Object} payload The updated request.
+         * @param {String} message The message to show.
          */
-        updateRequest(payload) {
+        updateRequest(payload, message) {
             api.updateRequest(payload)
                 .then(() => {
-                    notify(
-                        this,
-                        "The request is now in review.",
-                        "darkenSuccess"
-                    );
+                    notify(this, message, "darkenSuccess");
                     this.getRequests();
                 })
                 .catch(() => {
@@ -288,21 +376,7 @@ export default {
                 )
                 .then((value) => {
                     if (value) {
-                        this.cancelRequest(request).then(() => {
-                            const payload = {
-                                message:
-                                    "Your request for " +
-                                    request.name +
-                                    " has been declined.",
-                                username: request.requestingUser,
-                            };
-                            notify(
-                                this,
-                                "Succesfully cancelled the request.",
-                                "darkenSuccess"
-                            );
-                            api.createNotification(payload);
-                        });
+                        this.cancelRequest(request);
                     }
                 })
                 .catch((err) => {
@@ -313,11 +387,25 @@ export default {
         /**
          * Send a request to cancel the Request.
          *
-         * @param {String} id The request id to cancel.
+         * @param {Object} request The request to cancel.
          */
         cancelRequest(request) {
             api.deleteRequest(request._id)
                 .then(() => {
+                    const payload = {
+                        message:
+                            "Your request for " +
+                            request.name +
+                            " has been declined.",
+                        username: request.requestingUser,
+                    };
+                    notify(
+                        this,
+                        "The request has been cancelled.",
+                        "darkenSuccess"
+                    );
+                    api.createNotification(payload);
+
                     this.getRequests();
                 })
                 .catch(() => {
@@ -348,27 +436,62 @@ export default {
                 )
                 .then((value) => {
                     if (value) {
-                        this.cancelRequest(request._id).then(() => {
-                            notify(
-                                this,
-                                "Succesfully purchased the request.",
-                                "darkenSuccess"
-                            );
-                            const payload = {
-                                message:
-                                    "Your request for " +
-                                    request.name +
-                                    " has been approved and purchased.",
-                                username: request.requestingUser,
-                            };
-                            api.createNotification(payload);
-                        });
+                        this.purchaseRequest(request);
                     }
                 })
                 .catch((err) => {
                     // An error occurred
                     console.log(err);
                 });
+        },
+
+        /**
+         * Create payload to set request to purchased.
+         *
+         * @param {Object} request The request to purchase.
+         */
+        purchaseRequest(request) {
+            const payload = {
+                _id: request._id,
+                status: "Purchased",
+                reviewingUser: "",
+                history: request.history,
+            };
+            payload.history.push({
+                time: Date.now(),
+                status: "Purchased",
+                modifyingUser: store.getters.user.username,
+            });
+
+            this.updateRequest(payload, "Successfully purchased request.");
+
+            const notifyPayload = {
+                message:
+                    "Your request for " +
+                    request.name +
+                    " has been approved and purchased.",
+                username: request.requestingUser,
+            };
+            api.createNotification(notifyPayload);
+        },
+
+        /**
+         * Check if there is a reviewer for the request.
+         *
+         * @param {Object} request The request to check.
+         * @returns {Boolean} True if there are requests.
+         */
+        isReviewer(request) {
+            return request.reviewingUser;
+        },
+
+        /**
+         * Truncate time to remove time.
+         *
+         * @returns {Date} The truncated date.
+         */
+        timeTruncated: function (date) {
+            return date.toString().split("G")[0];
         },
     },
 };

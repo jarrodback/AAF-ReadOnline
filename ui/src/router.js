@@ -13,6 +13,9 @@ import NotFound from "./views/Error/NotFound.vue";
 import Forbidden from "./views/Error/Forbidden.vue";
 import AssignRequests from "./views/Employee/AssignRequests.vue";
 import AuthoriseRequests from "./views/Employee/AuthoriseRequests.vue";
+import Manage from "./views/Employee/Manage.vue";
+import UserManagement from "./views/Employee/UserManagement.vue";
+import LiveChat from "./views/LiveChat/LiveChat.vue";
 
 // Pass the router into Vue to use.
 Vue.use(Router);
@@ -25,6 +28,13 @@ export default new Router({
     base: process.env.BASE_URL,
     linkActiveClass: "active",
     routes: [
+        // Redirect to login page, must not be logged in.
+        {
+            path: "/",
+            name: "login-user",
+            component: Login,
+            beforeEnter: isLoggedOut,
+        },
         // Path to login page, must not be logged in.
         {
             path: "/login",
@@ -59,6 +69,27 @@ export default new Router({
             name: "authorise",
             component: AuthoriseRequests,
             beforeEnter: isAdmin,
+        },
+        // Path to manage readonline. Must be an admin.
+        {
+            path: "/manage/",
+            name: "manage",
+            component: Manage,
+            beforeEnter: isAdmin,
+        },
+        // Path to view user management. Must be an admin.
+        {
+            path: "/usermanagement/",
+            name: "usermanagement",
+            component: UserManagement,
+            beforeEnter: isAdmin,
+        },
+        // Path to view user management. Must be an admin.
+        {
+            path: "/chat/",
+            name: "chat",
+            component: LiveChat,
+            beforeEnter: isAuthenticated,
         },
         // If authentication fails, direct to Forbidden route.
         {

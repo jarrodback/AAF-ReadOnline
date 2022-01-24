@@ -33,6 +33,7 @@ class UserService {
             role: userToCreate.role,
             password: bcrypt.hashSync(userToCreate.password, 8),
         };
+
         return this.mongooseService.create(user).catch((error) => {
             throw httpError(404, error.message);
         });
@@ -206,11 +207,10 @@ class UserService {
         // if (!this.checkDuplicateUsername(user.username)) {
         //     throw httpError(400, "Username is already in use.");
         // }
-
         return this.createUser({
             username: user.username,
             email: user.email,
-            password: bcrypt.hashSync(user.password, 8),
+            password: user.password,
             role: "User",
         }).catch((error) => {
             throw httpError(400, error.message);

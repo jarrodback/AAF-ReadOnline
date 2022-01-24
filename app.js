@@ -28,6 +28,7 @@ var requestRouter = require("./routes/request.routes");
 var userRouter = require("./routes/user.routes");
 var authRouter = require("./routes/auth.routes");
 var notificationRouter = require("./routes/notification.routes");
+var configRouter = require("./routes/config.routes");
 
 /**
  * View Engine setup
@@ -48,6 +49,7 @@ app.use("/readonline", requestRouter);
 app.use("/usermanagement", userRouter);
 app.use("/auth", authRouter);
 app.use("/notify", notificationRouter);
+app.use("/config", configRouter);
 
 /**
  * Error handling

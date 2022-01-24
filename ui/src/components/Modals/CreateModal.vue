@@ -33,9 +33,11 @@
                 >
                     <b-form-input
                         type="number"
+                        step=".01"
                         id="cost-input"
                         v-model="createModal.cost"
                         :state="isCostValid"
+                        @keypress="validateNumber"
                     ></b-form-input>
                 </b-form-group>
 
@@ -86,7 +88,7 @@ export default {
          * Display options for book type.
          */
         options: function () {
-            return ["Book", "Audiobook"];
+            return ["Book", "Audiobook", "Magazine"];
         },
 
         /**
@@ -207,14 +209,37 @@ export default {
         validType() {
             return (
                 this.createModal.type == "Book" ||
-                this.createModal.type == "Audiobook"
+                this.createModal.type == "Audiobook" ||
+                this.createModal.type == "Magazine"
             );
+        },
+
+        /**
+         * Restrict input to 2 decimal places.
+         *
+         * @param {Event} event The key press event.
+         */
+        validateNumber(event) {
+            if (
+                this.createModal.cost != null &&
+                this.createModal.cost.indexOf(".") > -1 &&
+                this.createModal.cost.split(".")[1].length > 1
+            ) {
+                event.preventDefault();
+            }
         },
 
         /**
          * Send a request to create the Request.
          */
         createRequest() {
+            this.createModal.history = [];
+            this.createModal.history.push({
+                time: Date.now(),
+                status: "Pending Review",
+                modifyingUser: store.getters.user.username,
+            });
+
             api.createRequest(this.createModal)
                 .then(() => {
                     // If successful, send an event to trigger the refresh of requests on other component.

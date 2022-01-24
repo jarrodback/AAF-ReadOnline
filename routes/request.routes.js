@@ -28,6 +28,11 @@ router.put("/requests/:id", checkJwtToken, requestController.update);
 router.delete("/requests/:id", checkJwtToken, requestController.delete);
 
 // Delete all Requests of the database
-router.delete("/requests/", checkJwtToken, requestController.deleteAll);
+router.delete(
+    "/requests/",
+    checkJwtToken,
+    isAdmin,
+    requestController.deleteAll
+);
 
 module.exports = router;
