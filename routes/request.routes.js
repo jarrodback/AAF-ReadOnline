@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 // Authenticate the request with the token.
-const { checkJwtToken, isAdmin } = require("../auth/authJwt");
+const { checkJwtToken, isAdmin } = require("../middleware/auth/authJwt");
 
 // Get the Request controller
 var requestController = require("../controllers/request.controller");

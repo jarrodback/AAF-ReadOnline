@@ -125,15 +125,12 @@ describe("Testing the /usermanagement/users path", () => {
                 });
         });
 
-        it("it should return 404 if no User was found", (done) => {
+        it("it should return 200 if no User was found", (done) => {
             chai.request(server)
                 .get("/usermanagement/users/" + fakeId)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
-                    res.should.have.status(404);
-                    res.body.should.have.a
-                        .property("message")
-                        .eql("Could not find record.");
+                    res.should.have.status(400);
 
                     done();
                 });
@@ -198,7 +195,7 @@ describe("Testing the /usermanagement/users path", () => {
                 });
         });
 
-        it("if the User to update isn't found it should return 404", (done) => {
+        it("if the User to update isn't found it should return 400", (done) => {
             let to_update = {
                 username: "bob12",
             };
@@ -210,7 +207,7 @@ describe("Testing the /usermanagement/users path", () => {
                     res.should.have.status(404);
                     res.body.should.have.a
                         .property("message")
-                        .eql("Could not find record.");
+                        .eql("User does not exist.");
 
                     done();
                 });
@@ -237,7 +234,7 @@ describe("Testing the /usermanagement/users path", () => {
                 res.should.have.status(404);
                 res.body.should.have
                     .property("message")
-                    .eql("Could not find record.");
+                    .eql("User does not exist.");
 
                 done();
             });
@@ -306,11 +303,11 @@ describe("Testing the /usermanagement/users path", () => {
         });
         it("Non-admins shouldn't be able to create a User", (done) => {
             let request = {
-                username: "user2",
-                email: "user2@my.shu.ac.uk",
+                username: "user20",
+                email: "user20@my.shu.ac.uk",
                 password: "test",
                 requests: [],
-                role: "Admin",
+                role: "Employee",
             };
 
             chai.request(server)
@@ -348,6 +345,29 @@ describe("Testing the /usermanagement/users path", () => {
 
                     res.body.should.be.a("array");
                     res.body.length.should.be.eql(0);
+                    done();
+                });
+        });
+
+        it("it should create a User", (done) => {
+            let request = {
+                username: "jarrodback",
+                email: "user2@my.shu.ac.uk",
+                password: "test",
+                requests: [],
+                role: "Admin",
+            };
+            chai.request(server)
+                .post("/usermanagement/users")
+                .set("Cookie", cookie + ";  " + cookieSig)
+                .send(request)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a("object");
+                    res.body.should.have
+                        .property("message")
+                        .eql("User was successfully created.");
+
                     done();
                 });
         });

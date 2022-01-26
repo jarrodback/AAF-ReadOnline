@@ -59,19 +59,22 @@ describe("Testing the /readonline/requests path", () => {
                 cost: 40,
                 author: "My Author",
                 type: "Book",
-                requestingUser: "987654321121",
+                requestingUser: "jarrodback",
             };
+            123456789122;
             chai.request(server)
                 .post("/readonline/requests")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(request)
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.have
-                        .property("message")
-                        .eql("Request was successfully created.");
+                    setTimeout(function () {
+                        res.should.have.status(200);
+                        res.body.should.have
+                            .property("message")
+                            .eql("Request was successfully created.");
 
-                    done();
+                        done();
+                    }, 100);
                 });
         });
     });
@@ -99,22 +102,22 @@ describe("Testing the /readonline/requests path", () => {
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.be.a("array");
-                    res.body.length.should.be.eql(3);
+                    res.body.data.should.be.a("array");
+                    res.body.data.length.should.be.eql(4);
 
                     done();
                 });
         });
 
-        it("it should return 404 if no record was found", (done) => {
+        it("it should return empty if no record was found", (done) => {
             chai.request(server)
                 .get("/readonline/requests/" + fakeId)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
-                    res.should.have.status(404);
-                    res.body.should.have.a
-                        .property("message")
-                        .eql("Could not find record.");
+                    res.should.have.status(200);
+                    // res.body.should.have.a
+                    //     .property("message")
+                    //     .eql("Could not find record.");
 
                     done();
                 });
@@ -143,9 +146,9 @@ describe("Testing the /readonline/requests path", () => {
                     res.body.should.be.a("object");
                     res.body.should.have.property("_id");
                     res.body.should.have.property("name").eql("My Book");
-                    res.body.should.have.property("datePublished");
                     res.body.should.have.property("cost");
                     res.body.should.have.property("type");
+                    res.body.should.have.property("status");
                     res.body.should.have.property("requestingUser");
 
                     done();
@@ -167,8 +170,6 @@ describe("Testing the /readonline/requests path", () => {
                     res.body.should.have.a
                         .property("message")
                         .eql("Request was successfully updated.");
-
-                    done();
                 });
 
             chai.request(server)
@@ -180,6 +181,8 @@ describe("Testing the /readonline/requests path", () => {
                     res.body.should.have
                         .property("name")
                         .eql("My new named Book");
+
+                    done();
                 });
         });
 
@@ -202,6 +205,47 @@ describe("Testing the /readonline/requests path", () => {
         });
     });
 
+    describe("UPDATE /readonline/requests invalid", () => {
+        let cookieUser;
+        let cookieSigUser;
+        before(function (done) {
+            chai.request(server)
+                .post("/auth/login")
+                .send({
+                    email: "test2@test.com",
+                    password: "test2",
+                })
+                .end((err, res) => {
+                    cookieUser = res.headers["set-cookie"].pop().split(";")[0];
+                    cookieSigUser = res.headers["set-cookie"]
+                        .pop()
+                        .split(";")[0];
+
+                    done();
+                });
+        });
+
+        it("shouldn't be able to edit the request if it isnt' theirs", (done) => {
+            let to_update = {
+                name: "My new named Book",
+            };
+            chai.request(server)
+                .put("/readonline/requests/123456789123")
+                .set("Cookie", cookieUser + ";  " + cookieSigUser)
+                .send(to_update)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql(
+                            "You do not have permission to update this request."
+                        );
+
+                    done();
+                });
+        });
+    });
+
     describe("DELETE /readonline/requests/" + request1, () => {
         it("it should delete a Request", (done) => {
             chai.request(server)
@@ -216,8 +260,8 @@ describe("Testing the /readonline/requests path", () => {
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.be.a("array");
-                    res.body.length.should.be.eql(2);
+                    res.body.data.should.be.a("array");
+                    res.body.data.length.should.be.eql(3);
 
                     done();
                 });
@@ -225,13 +269,13 @@ describe("Testing the /readonline/requests path", () => {
 
         it("it should not delete a Request with an invalid id", (done) => {
             chai.request(server)
-                .delete("/readonline/requests/" + fakeId)
+                .delete("/readonline/requests/2224")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(404);
                     res.body.should.have
                         .property("message")
-                        .eql("Could not find record.");
+                        .eql("Request ID is invalid.");
 
                     done();
                 });
@@ -246,8 +290,6 @@ describe("Testing the /readonline/requests path", () => {
                     res.body.should.have.a
                         .property("message")
                         .eql("Requests were successfully deleted.");
-
-                    done();
                 });
 
             chai.request(server)
@@ -255,9 +297,20 @@ describe("Testing the /readonline/requests path", () => {
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
+                    // No returns
+                    done();
+                });
+        });
+    });
 
-                    res.body.should.be.a("array");
-                    res.body.length.should.be.eql(0);
+    describe("No permission to access /readonline/requests/" + request1, () => {
+        it("it should reject the request", (done) => {
+            chai.request(server)
+                .get("/readonline/requests")
+                .end((err, res) => {
+                    res.should.have.status(401);
+
+                    done();
                 });
         });
     });

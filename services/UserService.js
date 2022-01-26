@@ -4,7 +4,7 @@ const httpError = require("http-errors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 // Check if the ID given is a valid MongoDB ObjectID
-const isIdValid = require("./utilities").isIdValid;
+const isIdValid = require("../middleware/validation/utilities").isIdValid;
 
 class UserService {
     /**
@@ -109,7 +109,11 @@ class UserService {
         }
         return this.mongooseService
             .update(userToUpdate, to_update)
-            .then((data) => {})
+            .then((data) => {
+                if (!data) {
+                    throw httpError(200, "User does not exist.");
+                }
+            })
             .catch((error) => {
                 throw httpError(404, error.message);
             });
@@ -126,9 +130,16 @@ class UserService {
         if (!isIdValid(userToDelete)) {
             throw httpError(404, "User ID is invalid.");
         }
-        return this.mongooseService.deleteById(userToDelete).catch((error) => {
-            throw httpError(404, error.message);
-        });
+        return this.mongooseService
+            .deleteById(userToDelete)
+            .then((data) => {
+                if (!data) {
+                    throw httpError(400, "User does not exist.");
+                }
+            })
+            .catch((error) => {
+                throw httpError(404, error.message);
+            });
     }
 
     /**
@@ -201,18 +212,22 @@ class UserService {
      * @returns {httpError} 401 If login is unsuccessful.
      */
     async register(user) {
-        // if (!this.checkDuplicateEmail(user.email)) {
-        //     throw httpError(400, "Email is already in use.");
-        // }
-        // if (!this.checkDuplicateUsername(user.username)) {
-        //     throw httpError(400, "Username is already in use.");
-        // }
+        if (!this.checkDuplicateEmail(user.email)) {
+            throw httpError(400, "Email is already in use.");
+        }
+        if (!this.checkDuplicateUsername(user.username)) {
+            throw httpError(400, "Username is already in use.");
+        }
         return this.createUser({
             username: user.username,
             email: user.email,
             password: user.password,
             role: "User",
         }).catch((error) => {
+            if (error.message.includes("username"))
+                throw httpError(400, "Username is already in use.");
+            if (error.message.includes("email"))
+                throw httpError(400, "Email is already in use.");
             throw httpError(400, error.message);
         });
     }
@@ -224,7 +239,13 @@ class UserService {
      * @returns {Boolean} True if email is already in use.
      */
     async checkDuplicateEmail(email) {
-        return this.findUserByEmail(email);
+        return this.findUserByEmail(email)
+            .then(() => {
+                return false;
+            })
+            .catch(() => {
+                return true;
+            });
     }
 
     /**

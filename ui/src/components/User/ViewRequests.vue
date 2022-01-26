@@ -27,6 +27,7 @@
                 >
                     View Completed Requests
                 </b-form-checkbox>
+
             </div>
             <p
                 class=""
@@ -36,7 +37,7 @@
         <div>
 
         </div>
-        <div class="center">
+        <div class="overflow-auto center">
             <b-table
                 v-if="areRequests"
                 striped
@@ -44,6 +45,7 @@
                 :fields="fields"
                 :sort-by.sync="sortBy"
                 :sort-desc.sync="sortDesc"
+                :per-page="perPage"
                 responsive="sm"
             >
                 <template #cell(actions)="data">
@@ -76,7 +78,7 @@
                                 class="text-sm-right"
                             ><b>Reviewer:</b>
                             </b-col>
-                            <b-col v-if="isReviewer(data.item)">{{ data.item.reviewingUser }}</b-col>
+                            <b-col v-if="isReviewer(data.item)">{{ data.item.previousReviewer }}</b-col>
                             <b-col v-else> N/A </b-col>
                         </b-row>
 
@@ -93,7 +95,7 @@
                                 >
                                     [ <b>{{timeTruncated(new Date(history.time))}}</b>]: {{history.modifyingUser}} set the request to {{history.status}}
                                     <br>
-                                    <div v-if="history.comments"><b>Appended comments:</b> {{history.comments}}</div>
+                                    <div v-if="history.comments"><b>{{history.modifyingUser}} added comments:</b> {{history.comments}}</div>
                                 </div>
                             </b-col>
                         </b-row>
@@ -101,6 +103,34 @@
                 </template>
 
             </b-table>
+
+            <div>
+                <b-pagination
+                    v-if="areRequests"
+                    class="page"
+                    :total-rows="requestItemsCount"
+                    :per-page="perPage"
+                    v-model="currentPage"
+                    aria-controls="my-table"
+                ></b-pagination>
+                <p
+                    class="mt-3"
+                    v-if="areRequests"
+                >Current Page: {{ currentPage }}</p>
+
+                <div>
+                    <b-form-group label="Show entries per page:">
+                        <b-form-select
+                            class="
+                page
+                reducedWidth"
+                            v-model="perPage"
+                            :options="options"
+                        >
+                        </b-form-select>
+                    </b-form-group>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -150,6 +180,24 @@ export default {
         },
 
         /**
+         * Return the size of the requests.
+         *
+         * @returns {Number} The number of requests.
+         */
+        requestItemsCount: function () {
+            return this.getCount();
+        },
+
+        /**
+         * Return the total pages..
+         *
+         * @returns {Number} The number of pages.
+         */
+        totalPages: function () {
+            return this.$data.totalPage * this.requestItemsCount;
+        },
+
+        /**
          * Filter the list of requests using the users search.
          * If view completed is ticked, show purchased/declined requests.
          */
@@ -177,6 +225,13 @@ export default {
         areRequests() {
             return this.$data.requests && this.$data.requests.length > 0;
         },
+
+        /**
+         * Options for pagination settings.
+         */
+        options() {
+            return [5, 10, 15];
+        },
     },
 
     data() {
@@ -195,7 +250,28 @@ export default {
 
             // Sort by descending by default.
             sortDesc: false,
+
+            // How many requests to display per page.
+            perPage: 10,
+
+            // Current page number.
+            currentPage: 1,
+
+            // The amount of pages.
+            totalPage: 0,
+
+            // The amount of items.
+            count: 0,
         };
+    },
+
+    watch: {
+        currentPage() {
+            this.getRequests();
+        },
+        perPage() {
+            this.getRequests();
+        },
     },
 
     methods: {
@@ -221,11 +297,22 @@ export default {
          * Send a request to retrieve all Requests.
          */
         async getRequests() {
+            const offset = (this.currentPage - 1) * this.perPage;
             const query =
-                "?requestingUser=" + store.getters.user.id + "&reviewingUser=";
+                "?requestingUser=" +
+                store.getters.user.id +
+                "&offset=" +
+                offset +
+                "&limit=" +
+                this.perPage +
+                "&reviewingUser=";
             api.getRequests(query)
                 .then((results) => {
-                    this.requests = results;
+                    // Set page data.
+                    this.requests = results.data;
+                    this.totalPage = results.totalPages;
+                    this.count = results.count;
+
                     if (this.requests.length > 0) {
                         // Truncate the dates.
                         for (var x = 0; x < this.requests.length; x++) {
@@ -338,7 +425,18 @@ export default {
          * @returns {Boolean} True if there are requests.
          */
         isReviewer(request) {
-            return request.reviewingUser;
+            return request.previousReviewer;
+        },
+
+        /**
+         * Get the count of the list depending on if search query is active.
+         */
+        getCount() {
+            if (this.searchQuery != "") {
+                return this.filteredRequests.length;
+            } else {
+                return this.$data.count;
+            }
         },
     },
 };

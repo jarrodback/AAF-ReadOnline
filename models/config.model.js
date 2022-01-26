@@ -8,7 +8,7 @@ module.exports = (mongoose) => {
                 type: Number,
                 minimum: [0, "The cost threshold cannot be below 0."],
                 default: 100,
-                required: true,
+                required: [true, "The cost threshold must be supplied."],
             },
         })
     );

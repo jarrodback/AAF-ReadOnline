@@ -29,6 +29,9 @@ class ConfigService {
      * @returns {httpError} 404 If config could not be updated.
      */
     async updateConfig(to_update) {
+        if (!to_update) {
+            throw httpError(400, "No update body.");
+        }
         return this.mongooseService.update({}, to_update).catch((error) => {
             throw httpError(404, error.message);
         });

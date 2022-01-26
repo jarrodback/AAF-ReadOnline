@@ -1,7 +1,11 @@
 var express = require("express");
 var router = express.Router();
 // Authenticate the request with the token.
-const { checkJwtToken, isAdmin, isEmployee } = require("../auth/authJwt");
+const {
+    checkJwtToken,
+    isAdmin,
+    isEmployee,
+} = require("../middleware/auth/authJwt");
 
 // Get the User controller
 var configController = require("../controllers/config.controller");

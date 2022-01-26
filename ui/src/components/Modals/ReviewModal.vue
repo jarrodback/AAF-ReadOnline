@@ -6,6 +6,7 @@
             ref="review-modal"
             @ok="handleOk"
             :okTitle="'Confirm'"
+            :cancelTitle="'Back'"
         >
             <b-form
                 ref="reviewRequestForm"
@@ -106,7 +107,6 @@ export default {
          */
         openReviewModal(request) {
             this.request = { ...request };
-            this.request.reviewComments = "";
             this.$refs["review-modal"].show();
         },
 

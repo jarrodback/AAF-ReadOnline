@@ -2,7 +2,7 @@ const MongooseService = require("./MongooseService.js");
 const model = require("../database").getModel("request");
 const httpError = require("http-errors");
 // Check if the ID given is a valid MongoDB ObjectID
-const isIdValid = require("./utilities").isIdValid;
+const isIdValid = require("../middleware/validation/utilities").isIdValid;
 
 class RequestService {
     /**
@@ -25,10 +25,15 @@ class RequestService {
         if (!validateRequest(requestToCreate)) {
             throw httpError(400, "Request data is invalid.");
         }
-
         model
             .findByUsername(requestToCreate.requestingUser)
             .then((data) => {
+                if (!data || data.length == 0) {
+                    throw httpError(
+                        400,
+                        "Assosicated User could not be found."
+                    );
+                }
                 const requestingUser = data[0];
 
                 const request = {
@@ -50,7 +55,7 @@ class RequestService {
                     });
             })
             .catch(() => {
-                throw httpError(404, "Username does not exist.");
+                throw httpError(400, "sername does not exist.");
             });
     }
 
@@ -87,9 +92,19 @@ class RequestService {
      * @returns {httpError} 404 If no Request is found.
      */
     async findRequestByParams(params) {
-        return this.mongooseService.findByProperty(params).catch((error) => {
-            throw httpError(404, error.message);
-        });
+        let offset = 0;
+        let limit = 0;
+        if (params.limit) {
+            limit = params.limit;
+        }
+        if (params.offset) {
+            offset = params.offset;
+        }
+        return this.mongooseService
+            .findByProperty(params, offset, limit)
+            .catch((error) => {
+                throw httpError(404, error.message);
+            });
     }
 
     /**
@@ -100,20 +115,39 @@ class RequestService {
      * @returns {httpError} 200 If updating the Request is successful.
      * @returns {httpError} 404 If request could not be updated.
      */
-    async updateRequest(requestToUpdate, to_update) {
+    async updateRequest(requestToUpdate, to_update, requestedBy) {
         if (!isIdValid(requestToUpdate)) {
             throw httpError(404, "Request ID is invalid.");
         }
+
         if (!isValidateUpdate(to_update)) {
             throw httpError(
                 400,
                 "Request history must be included. See documentation for structure."
             );
         }
+
         return this.mongooseService
-            .update(requestToUpdate, to_update)
+            .findById(requestToUpdate)
+            .then((data) => {
+                if (!isValidateUpdatePerm(data, requestedBy)) {
+                    throw httpError(
+                        401,
+                        "You do not have permission to update this request."
+                    );
+                }
+
+                this.mongooseService
+                    .update(requestToUpdate, to_update)
+                    .catch((error) => {
+                        throw httpError(404, error.message);
+                    });
+            })
             .catch((error) => {
-                throw httpError(404, error.message);
+                if (!error.status) {
+                    throw httpError(404, "Could not find record.");
+                }
+                throw httpError(error.status, error.message);
             });
     }
 
@@ -140,12 +174,20 @@ class RequestService {
             .then(() => {
                 model.findByUserByRequest(requestToDelete).then((users) => {
                     let user = users[0];
-                    user.removeRequest(user._id, requestToDelete, (error) => {
-                        if (error) {
-                            console.log(error);
-                        }
-                        console.log("Sucessfully removed request from user.");
-                    });
+                    if (user) {
+                        user.removeRequest(
+                            user._id,
+                            requestToDelete,
+                            (error) => {
+                                if (error) {
+                                    console.log(error);
+                                }
+                                console.log(
+                                    "Sucessfully removed request from user."
+                                );
+                            }
+                        );
+                    }
                 });
             })
             .catch((error) => {
@@ -160,6 +202,15 @@ class RequestService {
      */
     async deleteAllRequests() {
         return this.mongooseService.deleteAll();
+    }
+
+    /**
+     *  Count the requests.
+     *
+     * @returns {httpError} 200 If deleteing the Requests is successful.
+     */
+    async count(params) {
+        return this.mongooseService.count(params);
     }
 }
 
@@ -193,16 +244,16 @@ function validateRequest(request) {
  *
  * @returns {Boolean} True if request is not in certain statuses.
  */
-function isValidDeleteRequest(request) {
-    if (
-        request.status == "Pending Review" ||
-        request.status == "Approved" ||
-        request.status == "Declined"
-    ) {
-        return true;
-    }
-    return false;
-}
+// function isValidDeleteRequest(request) {
+//     if (
+//         request.status == "Pending Review" ||
+//         request.status == "Approved" ||
+//         request.status == "Declined"
+//     ) {
+//         return true;
+//     }
+//     return false;
+// }
 
 /**
  *  Validates the data in a update Request.
@@ -210,10 +261,24 @@ function isValidDeleteRequest(request) {
  * @returns {Boolean} True if the object contains required info.
  */
 function isValidateUpdate(update) {
-    if (update.history) {
-        return true;
+    if (update.status && !update.history) {
+        return false;
     }
-    return false;
+    return true;
 }
 
+/**
+ *  Validates the user that made the request is updating.
+ *
+ * @returns {Boolean} True if the object contains required info.
+ */
+function isValidateUpdatePerm(request, requestedBy) {
+    if (
+        request.requestingUser != requestedBy.id &&
+        requestedBy.role == "User"
+    ) {
+        return false;
+    }
+    return true;
+}
 module.exports = RequestService;

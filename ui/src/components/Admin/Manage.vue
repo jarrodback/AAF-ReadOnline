@@ -86,6 +86,13 @@
                             </b-progress-bar>
 
                             <b-progress-bar
+                                :value="statusCounter['Needs Authorisation']"
+                                variant="danger"
+                            >
+                                <span> {{statusCounter['Needs Authorisation']}} </span>
+                            </b-progress-bar>
+
+                            <b-progress-bar
                                 :value="statusCounter['Declined']"
                                 variant="light"
                             >
@@ -147,6 +154,7 @@ export default {
                 "In Review",
                 "Needs More Information",
                 "Approved",
+                "Needs Authorisation",
                 "Declined",
                 "Purchased",
             ];
@@ -163,6 +171,8 @@ export default {
                     "Needs More Information":
                         this.statusCounter["Needs More Information"] ?? 0,
                     Approved: this.statusCounter["Approved"] ?? 0,
+                    "Needs Authorisation":
+                        this.statusCounter["Needs Authorisation"] ?? 0,
                     Declined: this.statusCounter["Declined"] ?? 0,
                     Purchased: this.statusCounter["Purchased"] ?? 0,
                 },
@@ -179,6 +189,7 @@ export default {
                     (this.statusCounter["Pending Review"] ?? 0) +
                     (this.statusCounter["Needs More Information"] ?? 0) +
                     (this.statusCounter["Approved"] ?? 0) +
+                    (this.statusCounter["Needs Authorisation"] ?? 0) +
                     (this.statusCounter["Declined"] ?? 0) +
                     (this.statusCounter["Purchased"] ?? 0)
                 );
@@ -197,7 +208,7 @@ export default {
                 .then((results) => {
                     let statusCounter = [];
                     // If successful, truncate the results and save them.
-                    this.requests = results;
+                    this.requests = results.data;
                     if (this.requests.length > 0) {
                         // Calculate the amount of each status.
                         for (var x = 0; x < this.requests.length; x++) {
@@ -214,6 +225,8 @@ export default {
                             "Needs More Information":
                                 statusCounter["Needs More Information"],
                             Approved: statusCounter["Approved"],
+                            "Needs Authorisation":
+                                statusCounter["Needs Authorisation"],
                             Declined: statusCounter["Declined"],
                             Purchased: statusCounter["Purchased"],
                         };

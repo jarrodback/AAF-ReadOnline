@@ -51,6 +51,9 @@ exports.findOne = (req, res) => {
     userService
         .findUser(req.params.id)
         .then((data) => {
+            if (!data) {
+                res.status(400).send({ message: "User does not exist." });
+            }
             res.send(data);
         })
         .catch((err) => {
@@ -66,7 +69,7 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     userService
         .updateUser(req.params.id, req.body)
-        .then(() => {
+        .then((data) => {
             res.status(200).send({
                 message: "User was successfully updated.",
             });

@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 // Authenticate the request with the token.
-const { checkJwtToken } = require("../auth/authJwt");
+const { checkJwtToken } = require("../middleware/auth/authJwt");
 
 // Get the User controller
 var notificationController = require("../controllers/notification.controller");

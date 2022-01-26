@@ -1,8 +1,8 @@
 var express = require("express");
 var router = express.Router();
 // Authenticate the request with the token.
-const { checkJwtToken } = require("../auth/authJwt");
-const { isAdmin } = require("../auth/authJwt");
+const { checkJwtToken } = require("../middleware/auth/authJwt");
+const { isAdmin } = require("../middleware/auth/authJwt");
 
 // Get the User controller
 var userController = require("../controllers/user.controller");
@@ -13,7 +13,7 @@ router.get("/", function (req, res) {
 });
 
 // Create a new user
-router.post("/users/", checkJwtToken, userController.create);
+router.post("/users/", checkJwtToken, isAdmin, userController.create);
 
 // Retrieve all users
 router.get("/users/", checkJwtToken, isAdmin, userController.findAll);

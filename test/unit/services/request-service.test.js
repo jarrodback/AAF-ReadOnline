@@ -9,27 +9,34 @@ chai.use(chaiAsPromised);
 const userId = "987654321122";
 const requestId = "123456789122";
 
+afterEach(function () {
+    sinon.restore();
+});
+
 describe("Testing Request Service", () => {
     const request = {
         name: "Name",
-        datePublished: Date.now(),
         cost: 5,
         author: "Author",
         type: "Book",
         requestingUser: userId,
     };
 
-    it("createRequest: should be successfully", (done) => {
+    it("createRequest: should be successful", (done) => {
         const requestService = new RequestService();
+
         requestService.mongooseService.create = sinon.stub();
+        request.requestingUser = "jarrodback";
         requestService.createRequest(request);
 
-        expect(requestService.mongooseService.create.calledOnce).to.be.true;
+        setTimeout(function () {
+            expect(requestService.mongooseService.create.calledOnce).to.be.true;
 
-        done();
+            done();
+        }, 100);
     });
 
-    it("createEquest: shouldn't be successful because of invalid request", (done) => {
+    it("createRequest: shouldn't be successful because of invalid request", (done) => {
         const invalidRequest = {};
         const requestService = new RequestService();
         requestService.mongooseService.create = sinon.stub();
@@ -87,16 +94,6 @@ describe("Testing Request Service", () => {
 
                 done();
             });
-    });
-
-    it("updateRequest: should be successful", (done) => {
-        const requestService = new RequestService();
-        requestService.mongooseService.update = sinon.stub();
-        requestService.updateRequest(requestId, { name: "New name" });
-
-        expect(requestService.mongooseService.update.calledOnce).to.be.true;
-
-        done();
     });
 
     it("updateRequest: shouldn't be successful because of invalid Id", (done) => {

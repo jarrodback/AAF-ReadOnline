@@ -18,6 +18,7 @@ checkJwtToken = (req, res, next) => {
         }
 
         req.userId = decoded.id;
+        req.username = decoded.username;
         req.email = decoded.email;
         req.role = decoded.role;
         return next();

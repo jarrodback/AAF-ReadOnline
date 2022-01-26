@@ -8,7 +8,7 @@ const notificationService = new NotificationService();
  */
 exports.create = (req, res) => {
     notificationService
-        .createNotification(req.body)
+        .createNotification(req.body, req.session)
         .then((data) => {
             console.log("Notification has been saved in the database: " + data);
 
@@ -56,7 +56,7 @@ exports.findAll = (req, res) => {
  */
 exports.delete = (req, res) => {
     notificationService
-        .deleteNotification(req.params.id)
+        .deleteNotification(req.params.id, req.session)
         .then(() => {
             res.status(200).send({
                 message: "Notification was successfully deleted.",

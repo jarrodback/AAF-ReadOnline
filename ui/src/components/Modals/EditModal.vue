@@ -184,7 +184,6 @@ export default {
          */
         openEditModal(request) {
             this.request = { ...request };
-            this.request.additionalInformation = "";
             this.$refs["edit-modal"].show();
         },
 

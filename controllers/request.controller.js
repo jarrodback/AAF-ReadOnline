@@ -33,32 +33,32 @@ exports.findAll = (req, res) => {
         req.protocol + "://" + req.get("host") + req.originalUrl
     );
     let params = new URLSearchParams(url.search);
-    if (params) {
-        params = Object.fromEntries(params);
+    params = Object.fromEntries(params);
 
-        requestService
-            .findRequestByParams(params)
-            .then((data) => {
-                res.send(data);
-            })
-            .catch((err) => {
-                res.status(err.status).send({
-                    message: err.message,
-                });
+    requestService
+        .findRequestByParams(params)
+        .then((data) => {
+            let paramsCount = { ...params };
+            if (paramsCount.offset || paramsCount.limit) {
+                delete paramsCount.offset;
+                delete paramsCount.limit;
+            }
+            requestService.count(paramsCount).then((count) => {
+                let totalPages = Math.ceil(count / params.limit);
+                // Return data about pagination.
+                const returnData = {
+                    data: data,
+                    totalPages: totalPages,
+                    count: count,
+                };
+                res.send(returnData);
             });
-    } else {
-        // Find all data in the request collection with no condition to find al
-        requestService
-            .findAllRequests()
-            .then((data) => {
-                res.send(data);
-            })
-            .catch((err) => {
-                res.status(err.status).send({
-                    message: err.message,
-                });
+        })
+        .catch((err) => {
+            res.status(err.status).send({
+                message: err.message,
             });
-    }
+        });
 };
 
 /**
@@ -85,7 +85,7 @@ exports.findRequest = (req, res) => {
  */
 exports.update = (req, res) => {
     requestService
-        .updateRequest(req.params.id, req.body)
+        .updateRequest(req.params.id, req.body, req.session)
         .then((data) => {
             res.status(200).send({
                 message: "Request was successfully updated.",

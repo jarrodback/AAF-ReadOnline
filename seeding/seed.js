@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 mongoose.requests = require("../models/request.model")(mongoose);
 mongoose.users = require("../models/user.model")(mongoose);
+mongoose.configs = require("../models/config.model")(mongoose);
+mongoose.notifications = require("../models/notification.model")(mongoose);
 const bcrypt = require("bcryptjs");
 
 const requests = [
@@ -11,8 +13,8 @@ const requests = [
         cost: 40,
         author: "My Author",
         type: "Book",
-        requestingUser: "61dd56a297402ee89224efb2",
-        status: "Accepted",
+        requestingUser: "987654321121",
+        status: "Approved",
     },
     {
         _id: "123456789122",
@@ -21,7 +23,17 @@ const requests = [
         cost: 5.03,
         author: "The author of the book",
         type: "Audiobook",
-        requestingUser: "61dd56a297402ee89224efb2",
+        requestingUser: "987654321121",
+        status: "Pending Review",
+    },
+    {
+        _id: "123456789123",
+        name: "The Magazine",
+        datePublished: new Date(),
+        cost: 5.33,
+        author: "The author of the magazine",
+        type: "Magazine",
+        requestingUser: "987654321123",
         status: "Pending Review",
     },
 ];
@@ -56,6 +68,26 @@ const users = [
     },
 ];
 
+const config = [
+    {
+        _id: "config",
+        costThreshold: 100,
+    },
+];
+
+const notifications = [
+    {
+        _id: "555555555555",
+        username: "user1",
+        message: "example",
+    },
+    {
+        _id: "655555555555",
+        username: "user2",
+        message: "example",
+    },
+];
+
 mongoose
     .connect("mongodb://localhost:27017/readonlinedb_testing", {
         useNewUrlParser: true,
@@ -73,6 +105,10 @@ const seedDB = async () => {
     await mongoose.requests.insertMany(requests);
     await mongoose.users.deleteMany();
     await mongoose.users.insertMany(users);
+    await mongoose.configs.deleteMany();
+    await mongoose.configs.insertMany(config);
+    await mongoose.notifications.deleteMany();
+    await mongoose.notifications.insertMany(notifications);
 };
 
 seedDB()

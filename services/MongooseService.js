@@ -35,22 +35,22 @@ class MongooseService {
      * @returns {Error} The record could not be found.
      */
     async findById(recordToFind) {
-        return this.model
-            .findById(recordToFind)
-            .orFail(() => new Error("Could not find record."));
+        return this.model.findById(recordToFind);
+        // .orFail(() => new Error("Could not find record."));
     }
 
     /**
      * Find a record by property in the database.
      *
      * @param {String} propertyToFind The property to find.
+     * @param {String} offset The offset to search for.
+     * @param {String} limit The amount of results to return.
      * @returns {Object} The found record.
      * @returns {Error} The record could not be found.
      */
-    async findByProperty(propertyToFind) {
-        return this.model
-            .find(propertyToFind)
-            .orFail(() => new Error("Could not find record."));
+    async findByProperty(propertyToFind, offset, limit) {
+        return this.model.find(propertyToFind).skip(offset).limit(limit);
+        // .orFail(() => new Error("Could not find record."));
     }
 
     /**
@@ -62,9 +62,8 @@ class MongooseService {
      * @returns {Error} The record could not be found.
      */
     async update(recordToUpdate, to_update) {
-        return this.model
-            .findByIdAndUpdate(recordToUpdate, to_update)
-            .orFail(() => new Error("Could not find record."));
+        return this.model.findByIdAndUpdate(recordToUpdate, to_update);
+        // .orFail(() => new Error("Could not find record."));
     }
 
     /**
@@ -75,9 +74,8 @@ class MongooseService {
      * @returns {Error} The record could not be found.
      */
     async deleteById(recordToDelete) {
-        return this.model
-            .findByIdAndDelete(recordToDelete)
-            .orFail(() => new Error("Could not find record."));
+        return this.model.findByIdAndDelete(recordToDelete);
+        // .orFail(() => new Error("Could not find record."));
     }
 
     /**
@@ -87,6 +85,15 @@ class MongooseService {
      */
     async deleteAll() {
         return this.model.deleteMany();
+    }
+
+    /**
+     * Count the amount of records
+     *
+     * @returns {Object} The count of all records.
+     */
+    async count(params) {
+        return this.model.count(params);
     }
 }
 
