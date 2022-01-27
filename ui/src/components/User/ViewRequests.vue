@@ -39,6 +39,7 @@
         </div>
         <div class="overflow-auto center">
             <b-table
+                id="request-table"
                 v-if="areRequests"
                 striped
                 :items="filteredRequests"

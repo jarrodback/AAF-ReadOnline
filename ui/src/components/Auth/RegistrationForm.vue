@@ -42,9 +42,24 @@
                     type="password"
                     id="password-input"
                     v-model="registerForm.password"
-                    placeholder="Enter name"
+                    placeholder="Enter password"
                     required
                 ></b-form-input>
+            </b-form-group>
+
+            <b-form-group
+                label="Confirm password"
+                label-for="password-confirm-input"
+                invalid-feedback="Password is required"
+            >
+                <b-form-input
+                    type="password"
+                    id="password-confirm-input"
+                    v-model="registerForm.confirmPassword"
+                    placeholder="Enter password"
+                    required
+                ></b-form-input>
+
                 <div class="submit-space">
                     <b-button
                         type="submit"

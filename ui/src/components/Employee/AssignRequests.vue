@@ -188,7 +188,6 @@ export default {
          * If there are requests, show the table.
          */
         areRequests() {
-            console.log(this.$data.requests.length);
             return this.$data.requests && this.$data.requests.length > 0;
         },
 

@@ -27,7 +27,7 @@
                     type="password"
                     id="password-input"
                     v-model="loginForm.password"
-                    placeholder="Enter name"
+                    placeholder="Enter password"
                     required
                 ></b-form-input>
                 <div class="submit-space">
@@ -73,6 +73,7 @@ export default {
                         id: value.data.id,
                         username: value.data.username,
                         role: value.data.role,
+                        rights: value.data.rights,
                     });
 
                     this.$router.push("requests");

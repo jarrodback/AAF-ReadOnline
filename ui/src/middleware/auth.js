@@ -23,6 +23,21 @@ export const isAdmin = (to, from, next) => {
 };
 
 /**
+ * Check if the user transitioning the route is an admin.
+ */
+export const isAuthorised = (to, from, next) => {
+    if (
+        store.getters.user.role == "Admin" ||
+        (store.getters.user.rights.length > 0 &&
+            store.getters.user.rights.includes("authorise"))
+    ) {
+        next();
+    } else {
+        next({ path: "/forbidden" });
+    }
+};
+
+/**
  * Check if the user transitioning the route is an employee.
  */
 export const isEmployee = (to, from, next) => {

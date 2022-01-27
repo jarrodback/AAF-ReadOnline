@@ -4,14 +4,21 @@
             <h1>User Management</h1>
         </div>
         <div class="center">
+            <div class="search">
+                <b-button
+                    class="createbutton"
+                    v-on:click="openCreateUserModal"
+                    variant="success"
+                >Create</b-button>
 
-            <b-form-input
-                v-if="areUsers"
-                size="sm"
-                class="mr-sm-2 input"
-                placeholder="Search for a user"
-                v-model="searchQuery"
-            ></b-form-input>
+                <b-form-input
+                    v-if="areUsers"
+                    size="sm"
+                    class="mr-sm-2 input"
+                    placeholder="Search for a user"
+                    v-model="searchQuery"
+                ></b-form-input>
+            </div>
 
             <p v-if="!areUsers">No users to show.</p>
             <b-table
@@ -193,6 +200,13 @@ export default {
          */
         edit(user) {
             this.$emit("editUser", user);
+        },
+
+        /**
+         * Show the modal to create the request.
+         */
+        openCreateUserModal() {
+            this.$emit("createUser");
         },
     },
 };

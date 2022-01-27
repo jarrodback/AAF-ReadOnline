@@ -178,7 +178,6 @@ export default {
                 "type",
                 { key: "status", sortable: true },
                 { key: "dateCreated", sortable: true },
-                "requestingUser",
                 "Actions",
                 "Details",
             ];

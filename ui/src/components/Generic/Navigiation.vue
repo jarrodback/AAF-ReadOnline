@@ -26,12 +26,12 @@
                     >Assign Requests</b-nav-item>
 
                     <b-nav-item-dropdown
-                        v-if="isAdmin"
+                        v-if="isAuthorised"
                         id="admin-dropdown"
                         text="Admin"
                     >
                         <b-dropdown-item
-                            v-if="isAdmin"
+                            v-if="isAuthorised"
                             v-on:click="goToAdminPage"
                             href="#"
                         >Authorise</b-dropdown-item>
@@ -184,6 +184,19 @@ export default {
          */
         getUserRole() {
             return store.getters.user.role;
+        },
+
+        /**
+         * Is user authorised?
+         *
+         * @returns {Boolean} True if authorised.
+         */
+        isAuthorised() {
+            return (
+                store.getters.user.role == "Admin" ||
+                (store.getters.user.rights &&
+                    store.getters.user.rights.includes("authorise"))
+            );
         },
 
         /**

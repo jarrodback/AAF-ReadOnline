@@ -5,6 +5,7 @@ import {
     isEmployee,
     isAdmin,
     isLoggedOut,
+    isAuthorised,
 } from "./middleware/auth";
 import ListRequest from "./views/Requests/ListRequests.vue";
 import Login from "./views/Auth/Login.vue";
@@ -68,7 +69,7 @@ export default new Router({
             path: "/requests/authorise/",
             name: "authorise",
             component: AuthoriseRequests,
-            beforeEnter: isAdmin,
+            beforeEnter: isAuthorised,
         },
         // Path to manage readonline. Must be an admin.
         {

@@ -3,6 +3,7 @@
         <user-management
             ref=userManagement
             @editUser="editUser"
+            @createUser="createUser"
         >
         </user-management>
 
@@ -11,12 +12,19 @@
             @refreshUsers="refreshUsers"
         >
         </edit-user-modal>
+
+        <create-user-modal
+            ref=createUserModal
+            @refreshUsers="refreshUsers"
+        >
+        </create-user-modal>
     </div>
 </template>
 
 <script>
 import UserManagement from "../../components/Admin/UserManagement.vue";
 import EditUserModal from "../../components/Modals/EditUserModal.vue";
+import CreateUserModal from "../../components/Modals/CreateUserModal.vue";
 
 /**
  * View to control the user management page.
@@ -26,6 +34,7 @@ export default {
     components: {
         "user-management": UserManagement,
         "edit-user-modal": EditUserModal,
+        "create-user-modal": CreateUserModal,
     },
 
     methods: {
@@ -43,6 +52,13 @@ export default {
          */
         editUser(user) {
             this.$refs.userModal.openEditModal(user);
+        },
+
+        /**
+         * Send an event user to open the create modal.
+         */
+        createUser() {
+            this.$refs.createUserModal.openCreateModal();
         },
     },
 };

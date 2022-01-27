@@ -1,20 +1,20 @@
   <template>
     <div>
         <b-modal
-            id="edit-user-modal"
-            title="Edit User"
-            ref="edit-user-modal"
+            id="create-user-modal"
+            title="Create User"
+            ref="create-user-modal"
             @ok="handleOk"
-            :okTitle="'Edit'"
+            :okTitle="'Create'"
         >
             <b-form
-                ref="editUserForm"
+                ref="createUserForm"
                 @submit.stop.prevent="handleSubmit"
             >
                 <b-form-group
                     label="Username"
                     label-for="username-input"
-                    invalid-feedback="Username is required"
+                    invalid-feedback="Username is required of at least 5 characters"
                 >
                     <b-form-input
                         type="text"
@@ -39,6 +39,19 @@
                 </b-form-group>
 
                 <b-form-group
+                    label="Password"
+                    label-for="password-input"
+                    invalid-feedback="Password with a minimum length of 8 is required"
+                >
+                    <b-form-input
+                        type="password"
+                        id="password-input"
+                        v-model="user.password"
+                        :state="isPasswordValid"
+                    ></b-form-input>
+                </b-form-group>
+
+                <b-form-group
                     label="Role"
                     label-for="role-input"
                     invalid-feedback="Role is required"
@@ -47,18 +60,9 @@
                         id="role-input"
                         v-model="user.role"
                         :options="options"
+                        :state="isRoleValid"
                     >
                     </b-form-select>
-                </b-form-group>
-
-                <b-form-group v-if="isEmployee">
-                    <b-form-checkbox
-                        id="checkbox-1"
-                        v-model="grantAuthorisation"
-                        name="checkbox-1"
-                    >
-                        Grant Authorise Permissions
-                    </b-form-checkbox>
                 </b-form-group>
             </b-form>
         </b-modal>
@@ -69,10 +73,10 @@
 import { api, notify } from "../../helpers/helpers.js";
 
 /**
- * Component to show the edit user modal.
+ * Component to show the create user modal.
  */
 export default {
-    name: "edit-modal",
+    name: "create-modal",
     computed: {
         /**
          * Display options for book type.
@@ -88,6 +92,28 @@ export default {
         isUsernameValid() {
             if (this.user.username) {
                 return this.validUsername();
+            }
+            return false;
+        },
+
+        /**
+         * Check if name meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
+        isPasswordValid() {
+            if (this.user.password) {
+                return this.user.password.length > 8;
+            }
+            return false;
+        },
+
+        /**
+         * Check if name meets constraints.
+         * @return {Boolean} Whether the condition is true.
+         */
+        isRoleValid() {
+            if (this.user.role) {
+                return true;
             }
             return false;
         },
@@ -112,7 +138,12 @@ export default {
          * @return {Boolean} Whether the condition is true.
          */
         isFormValid() {
-            return this.isUsernameValid && this.isEmailValid;
+            return (
+                this.isUsernameValid &&
+                this.isEmailValid &&
+                this.isPasswordValid &&
+                this.isRoleValid
+            );
         },
 
         /**
@@ -120,16 +151,6 @@ export default {
          */
         isEmployee() {
             return this.user.role == "Employee";
-        },
-
-        /**
-         * Check if user has authorisation role.
-         */
-        hasAuthorisationRole() {
-            return (
-                this.user.rights.length > 0 &&
-                this.user.rights.includes("authorise")
-            );
         },
     },
 
@@ -147,17 +168,8 @@ export default {
         /**
          * Show the modal on the page.
          */
-        openEditModal(user) {
-            this.user = { ...user };
-            if (
-                this.user.rights.length > 0 &&
-                this.user.rights.includes("authorise")
-            ) {
-                this.grantAuthorisation = true;
-            } else {
-                this.grantAuthorisation = false;
-            }
-            this.$refs["edit-user-modal"].show();
+        openCreateModal() {
+            this.$refs["create-user-modal"].show();
         },
 
         /**
@@ -165,7 +177,7 @@ export default {
          */
         handleOk(event) {
             if (this.isFormValid) {
-                this.editRequest();
+                this.createRequest();
             } else {
                 event.preventDefault();
             }
@@ -177,7 +189,7 @@ export default {
          * @returns {Boolean} Whether the condition is met
          */
         validUsername() {
-            return this.user.username.length > 0 ? true : false;
+            return this.user.username.length > 4 ? true : false;
         },
 
         /**
@@ -191,32 +203,26 @@ export default {
         },
 
         /**
-         * Send a user to edit the Users.
+         * Send a user to create the Users.
          */
-        editRequest() {
+        createRequest() {
             let payload = { ...this.user };
-            if (this.grantAuthorisation) {
-                payload.rights.push("authorise");
-            } else {
-                const index = payload.rights.indexOf("authorise");
-                payload.rights.splice(index, 1);
-            }
-            this.grantAuthorisation = false;
-
-            api.updateUser(payload)
+            this.user = {};
+            api.createUser(payload)
                 .then(() => {
                     notify(
                         this,
-                        "Successfully edited the user.",
+                        "Successfully created the user.",
                         "darkenSuccess"
                     );
-                    delete this.user;
+
                     this.$emit("refreshUsers");
                 })
-                .catch(() => {
+                .catch((error) => {
+                    console.log(error);
                     notify(
                         this,
-                        "Failed to edit the user. Try again.",
+                        "Failed to create the user. Try again. Error: The username or email already exist.",
                         "error"
                     );
                 });
