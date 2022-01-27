@@ -68,7 +68,7 @@ exports.findOne = (req, res) => {
  */
 exports.update = (req, res) => {
     userService
-        .updateUser(req.params.id, req.body)
+        .updateUser(req.params.id, req.body, req.session)
         .then((data) => {
             res.status(200).send({
                 message: "User was successfully updated.",

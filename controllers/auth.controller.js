@@ -19,6 +19,7 @@ exports.login = async (req, res) => {
                 username: data.username,
                 role: data.role,
                 id: data.id,
+                rights: data.rights,
             });
         })
         .catch((error) => {

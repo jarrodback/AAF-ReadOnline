@@ -14,7 +14,8 @@ module.exports = (mongoose) => {
         },
         password: {
             type: String,
-            required: true,
+            required: [true, "You must supply the user's password"],
+            minlength: [5, "Your password must be at least 8 letters."],
         },
         requests: [mongoose.Schema.Types.ObjectId],
         role: {
@@ -31,6 +32,11 @@ module.exports = (mongoose) => {
             required: [true, "You must supply the user's creation date."],
             default: Date.now,
         },
+        rights: [
+            {
+                type: String,
+            },
+        ],
     });
 
     /**
@@ -40,6 +46,22 @@ module.exports = (mongoose) => {
         return mongoose
             .model("user")
             .update({ _id: userId }, { $pull: { requests: requestId } }, cb);
+    };
+
+    /**
+     * Check permission exists.
+     */
+    UserSchema.statics.checkPermission = function (permission) {
+        return mongoose
+            .model("permission")
+            .find({})
+            .then((data) => {
+                if (data[0].includes(permission)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
     };
 
     return mongoose.model("user", UserSchema);

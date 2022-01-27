@@ -6,6 +6,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const createError = require("http-errors");
 const cookieSession = require("cookie-session");
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
 
 require("dotenv").config();
 
@@ -19,6 +21,51 @@ app.use(
         secret: process.env.TOKEN_SECRET,
         httpOnly: true,
     })
+);
+
+/**
+ * OpenAPI (Swagger) Setup
+ */
+const options = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "ReadBooks: Online API",
+            version: "1.0.0",
+            description:
+                "Documentation for the ReadBooks Online API. Includes requests, users and notifications.",
+            contact: {
+                name: "Readbooks Online",
+                url: "http://localhost:8080",
+            },
+        },
+
+        servers: [
+            {
+                url: "http://localhost:3050",
+                description: "API Documentation",
+            },
+        ],
+    },
+    apis: ["./Routes/*.js"],
+
+    components: {
+        securitySchemes: {
+            cookieAuth: {
+                type: "apiKey",
+                in: "cookie",
+                name: "readbooksonline_token",
+            },
+        },
+    },
+};
+
+const specs = swaggerJsDoc(options);
+
+app.use(
+    "/api-docs",
+    swaggerUI.serve,
+    swaggerUI.setup(specs, { explorer: true })
 );
 
 /**

@@ -36,3 +36,245 @@ router.delete(
 );
 
 module.exports = router;
+
+/**
+ * @swagger
+ * /readonline/requests/:
+ *   get:
+ *     security:
+ *       - cookieAuth: []
+ *     summary: Get all requests
+ *     tags: [Requests]
+ *     responses:
+ *       200:
+ *         description: Message containing all the user's requests.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   author:
+ *                     type: string
+ *                   cost:
+ *                     type: integer
+ *                   requestedBy:
+ *                     type: ObjectId
+ *                   status:
+ *                     type: string
+ *                   reviewingUser:
+ *                     type: string
+ *                   previousReviewer:
+ *                     type: string
+ *                   history:
+ *                     type: object
+ *                     properties:
+ *                       status:
+ *                         type: string
+ *                       user:
+ *                         type: string
+ *       404:
+ *         description: No requests found
+ *       401:
+ *         description: Unauthorised.
+ *       403:
+ *         description: Forbidden, no permission.
+ */
+
+/**
+ * @swagger
+ * /readonline/requests/:id/:
+ *   get:
+ *     security:
+ *       - cookieAuth: []
+ *     summary: Get request
+ *     tags: [Requests]
+ *     parameters:
+ *       - in : path
+ *         name: id
+ *         description: id of request
+ *         schema:
+ *           type: integer
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Message containing all the request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                 author:
+ *                   type: string
+ *                 cost:
+ *                   type: integer
+ *                 requestedBy:
+ *                   type: ObjectId
+ *                 status:
+ *                   type: string
+ *                 reviewingUser:
+ *                   type: string
+ *                 previousReviewer:
+ *                   type: string
+ *                 history:
+ *                   type: object
+ *                   properties:
+ *                     status:
+ *                       type: string
+ *                     user:
+ *                       type: string
+ *       404:
+ *         description: Request wasn't found
+ *       401:
+ *         description: Unauthorised.
+ *       403:
+ *         description: Forbidden, no permission.
+ */
+
+/**
+ * @swagger
+ * /readonline/requests/:
+ *   post:
+ *     security:
+ *       - cookieAuth: []
+ *     summary: Create request
+ *     tags: [Requests]
+ *     requestBody:
+ *       description: Example of request create body
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                 author:
+ *                   type: string
+ *                 cost:
+ *                   type: integer
+ *                 requestedBy:
+ *                   type: ObjectId
+ *     responses:
+ *       200:
+ *         description: Message stating the request was created.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Request failed to be created.
+ *       401:
+ *         description: Unauthorised.
+ *       403:
+ *         description: Forbidden, no permission.
+ */
+
+/**
+ * @swagger
+ * /readonline/requests/:
+ *   put:
+ *     security:
+ *       - cookieAuth: []
+ *     summary: Update request
+ *     tags: [Requests]
+ *     requestBody:
+ *       description: Example of request update body
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                 author:
+ *                   type: string
+ *                 cost:
+ *                   type: integer
+ *                 requestedBy:
+ *                   type: ObjectId
+ *     responses:
+ *       200:
+ *         description: Message stating the request was updated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Request failed to be updated.
+ *       401:
+ *         description: Unauthorised.
+ *       403:
+ *         description: Forbidden, no permission.
+ */
+
+/**
+ * @swagger
+ * /readonline/requests/:id/:
+ *   delete:
+ *     security:
+ *       - cookieAuth: []
+ *     summary: Delete request
+ *     tags: [Requests]
+ *     parameters:
+ *       - in : path
+ *         name: id
+ *         description: id of request
+ *         schema:
+ *           type: integer
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Message stating the request was deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Request failed to be deleted.
+ *       403:
+ *         description: User doesn't have permission to delete the request.
+ *       401:
+ *         description: Unauthorised.
+ */
+
+/**
+ * @swagger
+ * /readonline/requests/:
+ *   delete:
+ *     security:
+ *       - cookieAuth: []
+ *     summary: Delete all requests
+ *     tags: [Requests]
+ *     responses:
+ *       200:
+ *         description: Message stating the requests were deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Requests failed to be deleted.
+ *       403:
+ *         description: User doesn't have permission to delete the requests.
+ *       401:
+ *         description: Unauthorised.
+ */

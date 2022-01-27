@@ -35,6 +35,10 @@ class UserService {
         };
 
         return this.mongooseService.create(user).catch((error) => {
+            if (error.message.includes("username"))
+                throw httpError(400, "Username is already in use.");
+            if (error.message.includes("email"))
+                throw httpError(400, "Email is already in use.");
             throw httpError(404, error.message);
         });
     }
@@ -103,10 +107,17 @@ class UserService {
      * @returns {httpError} 200 If updating the User is successful.
      * @returns {httpError} 404 If user could not be updated.
      */
-    async updateUser(userToUpdate, to_update) {
+    async updateUser(userToUpdate, to_update, updatingUser) {
+        if (updatingUser.role != "Admin" && to_update.rights.length > 0) {
+            throw httpError(
+                403,
+                "You do not have permission to update the user's rights."
+            );
+        }
         if (!isIdValid(userToUpdate)) {
             throw httpError(404, "User ID is invalid.");
         }
+
         return this.mongooseService
             .update(userToUpdate, to_update)
             .then((data) => {
@@ -196,6 +207,7 @@ class UserService {
                     username: user.username,
                     role: user.role,
                     id: user._id,
+                    rights: user.rights,
                 };
             })
             .catch(() => {
