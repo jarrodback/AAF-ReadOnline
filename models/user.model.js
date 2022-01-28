@@ -48,21 +48,5 @@ module.exports = (mongoose) => {
             .update({ _id: userId }, { $pull: { requests: requestId } }, cb);
     };
 
-    /**
-     * Check permission exists.
-     */
-    UserSchema.statics.checkPermission = function (permission) {
-        return mongoose
-            .model("permission")
-            .find({})
-            .then((data) => {
-                if (data[0].includes(permission)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-    };
-
     return mongoose.model("user", UserSchema);
 };

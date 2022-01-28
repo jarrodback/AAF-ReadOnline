@@ -99,7 +99,8 @@ describe("Testing User Service", () => {
     it("updateUser: should be successful", (done) => {
         const userService = new UserService();
         userService.mongooseService.update = sinon.stub();
-        userService.updateUser(userId, { name: "New name" });
+        console.log("starting test");
+        userService.updateUser(userId, { name: "New name" }, { role: "User" });
 
         expect(userService.mongooseService.update.calledOnce).to.be.true;
 
@@ -112,7 +113,7 @@ describe("Testing User Service", () => {
         userService.mongooseService.update = sinon.stub();
 
         userService
-            .updateUser(invalidUserId)
+            .updateUser(invalidUserId, {}, { role: "User" })
             .then(() => {
                 expect.fail("Promise should have been rejected.");
             })

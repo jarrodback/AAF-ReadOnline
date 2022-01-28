@@ -6,6 +6,7 @@
         <div>
             <div class="center search">
                 <b-button
+                    id="create-request"
                     class="createbutton"
                     v-on:click="openCreateModal"
                     variant="success"
@@ -51,11 +52,13 @@
             >
                 <template #cell(actions)="data">
                     <b-button
+                        v-bind:id="data.item.name"
                         variant="info"
                         v-if="canEdit(data.item.status)"
                         @click="openEditModal(data.item)"
                     >Edit</b-button>
                     <b-button
+                        v-bind:id="data.item.name"
                         variant="danger"
                         v-if="canCancel(data.item.status)"
                         @click="cancel(data.item)"
@@ -119,7 +122,7 @@
                     v-if="areRequests"
                 >Current Page: {{ currentPage }}</p>
 
-                <div>
+                <div v-if="areRequests">
                     <b-form-group label="Show entries per page:">
                         <b-form-select
                             class="
@@ -305,8 +308,7 @@ export default {
                 "&offset=" +
                 offset +
                 "&limit=" +
-                this.perPage +
-                "&reviewingUser=";
+                this.perPage;
             api.getRequests(query)
                 .then((results) => {
                     // Set page data.

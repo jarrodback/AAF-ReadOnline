@@ -25,7 +25,7 @@ class RequestService {
         if (!validateRequest(requestToCreate)) {
             throw httpError(400, "Request data is invalid.");
         }
-        model
+        return model
             .findByUsername(requestToCreate.requestingUser)
             .then((data) => {
                 if (!data || data.length == 0) {
@@ -45,17 +45,12 @@ class RequestService {
                     history: requestToCreate.history,
                 };
 
-                return this.mongooseService
-                    .create(request)
-                    .then((data) => {
-                        model.saveRequestToUser(requestingUser, data._id);
-                    })
-                    .catch((error) => {
-                        throw httpError(404, error.message);
-                    });
+                return this.mongooseService.create(request).then((data) => {
+                    model.saveRequestToUser(requestingUser, data._id);
+                });
             })
-            .catch(() => {
-                throw httpError(400, "sername does not exist.");
+            .catch((error) => {
+                throw httpError(400, error.message);
             });
     }
 

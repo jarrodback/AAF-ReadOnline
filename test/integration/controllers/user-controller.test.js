@@ -62,9 +62,7 @@ describe("Testing the /usermanagement/users path", () => {
                     res.body.should.be.a("object");
                     res.body.should.have
                         .property("message")
-                        .eql(
-                            "user validation failed: username: Your username must be at least 5 letters."
-                        );
+                        .eql("Username must be at least 5 letters.");
 
                     done();
                 });
@@ -321,6 +319,33 @@ describe("Testing the /usermanagement/users path", () => {
                         .property("message")
                         .eql(
                             "Unauthorized: You not do have permission to view this page."
+                        );
+
+                    done();
+                });
+        });
+
+        it("Non-admins shouldn't be able to update a User's rights", (done) => {
+            let request = {
+                username: "user20",
+                email: "user20@my.shu.ac.uk",
+                password: "test",
+                requests: [],
+                role: "Employee",
+                rights: ["authorise"],
+            };
+
+            chai.request(server)
+                .put("/usermanagement/users/" + user1)
+                .set("Cookie", cookieUser + ";  " + cookieSigUser)
+                .send(request)
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    res.body.should.be.a("object");
+                    res.body.should.have
+                        .property("message")
+                        .eql(
+                            "You do not have permission to update the user's rights."
                         );
 
                     done();

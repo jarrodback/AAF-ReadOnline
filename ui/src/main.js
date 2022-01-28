@@ -18,6 +18,10 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import "@/assets/css/main.css";
 
 /**
+ * Import testing packages.
+ */
+
+/**
  * Configure and enable the packages to use with vue.
  */
 Vue.use(VueNotification, {

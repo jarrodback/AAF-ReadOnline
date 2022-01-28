@@ -35,6 +35,9 @@ class UserService {
         };
 
         return this.mongooseService.create(user).catch((error) => {
+            if (error.message.includes("5 letters")) {
+                throw httpError(400, "Username must be at least 5 letters.");
+            }
             if (error.message.includes("username"))
                 throw httpError(400, "Username is already in use.");
             if (error.message.includes("email"))
@@ -108,12 +111,18 @@ class UserService {
      * @returns {httpError} 404 If user could not be updated.
      */
     async updateUser(userToUpdate, to_update, updatingUser) {
-        if (updatingUser.role != "Admin" && to_update.rights.length > 0) {
+        if (
+            updatingUser.role != "Admin" &&
+            to_update &&
+            to_update.rights &&
+            to_update.rights.length > 0
+        ) {
             throw httpError(
                 403,
                 "You do not have permission to update the user's rights."
             );
         }
+
         if (!isIdValid(userToUpdate)) {
             throw httpError(404, "User ID is invalid.");
         }

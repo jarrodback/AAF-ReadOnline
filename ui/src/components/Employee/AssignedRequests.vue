@@ -42,16 +42,19 @@
                             v-on:click="openReviewModal(data.item)"
                         >View Response</b-button>
                         <b-button
+                            v-bind:id="data.item.name"
                             variant="info"
                             v-else-if="inReview(data.item)"
                             v-on:click="openReviewModal(data.item)"
                         >Needs More Information</b-button>
                         <b-button
+                            v-bind:id="data.item.name"
                             variant="info"
                             v-else-if="pendingReview(data.item)"
                             v-on:click="beginWorkOnRequest(data.item)"
                         >Review</b-button>
                         <b-button
+                            v-bind:id="data.item.name"
                             variant="success"
                             v-if="inReview(data.item)"
                             v-on:click="openApproveModal(data.item)"
@@ -117,7 +120,7 @@
                     v-if="areRequests"
                 >Current Page: {{ currentPage }}</p>
 
-                <div>
+                <div v-if="areRequests">
                     <b-form-group label="Show entries per page:">
                         <b-form-select
                             class="

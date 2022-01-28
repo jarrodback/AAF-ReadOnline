@@ -26,6 +26,7 @@
             >
                 <template #cell(actions)="data">
                     <b-button
+                        v-bind:id="data.item.name"
                         variant="info"
                         @click="assign(data.item)"
                     >Assign</b-button>
@@ -88,7 +89,7 @@
                     v-if="areRequests"
                 >Current Page: {{ currentPage }}</p>
 
-                <div>
+                <div v-if="areRequests">
                     <b-form-group label="Show entries per page:">
                         <b-form-select
                             class="

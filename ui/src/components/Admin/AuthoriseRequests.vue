@@ -27,6 +27,7 @@
                 <template #cell(actions)="data">
                     <b-button-group>
                         <b-button
+                            v-bind:id="data.item.name"
                             variant="success"
                             @click="accept(data.item)"
                         >Authorise</b-button>
@@ -95,8 +96,12 @@
                 >Current Page: {{ currentPage }}</p>
 
                 <div>
-                    <b-form-group label="Show entries per page:">
+                    <b-form-group
+                        v-if="areRequests"
+                        label="Show entries per page:"
+                    >
                         <b-form-select
+                            v-if="areRequests"
                             class="
                 page
                 reducedWidth"
@@ -366,12 +371,18 @@ export default {
         acceptRequest(request) {
             const payload = {
                 _id: request._id,
-                status: "Approved",
+                status: "Purchased",
+                reviewingUser: "",
                 history: request.history,
             };
             payload.history.push({
                 time: Date.now(),
                 status: "Approved",
+                modifyingUser: store.getters.user.username,
+            });
+            payload.history.push({
+                time: Date.now(),
+                status: "Purchased",
                 modifyingUser: store.getters.user.username,
             });
 
