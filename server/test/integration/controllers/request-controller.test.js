@@ -103,7 +103,7 @@ describe("Testing the /readonline/requests path", () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.data.should.be.a("array");
-                    res.body.data.length.should.be.eql(4);
+                    res.body.data.length.should.be.eql(10);
 
                     done();
                 });
@@ -176,13 +176,15 @@ describe("Testing the /readonline/requests path", () => {
                 .get("/readonline/requests/" + request1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a("object");
-                    res.body.should.have
-                        .property("name")
-                        .eql("My new named Book");
+                    setTimeout(function () {
+                        res.should.have.status(200);
+                        res.body.should.be.a("object");
+                        res.body.should.have
+                            .property("name")
+                            .eql("My new named Book");
 
-                    done();
+                        done();
+                    }, 100);
                 });
         });
 
@@ -261,7 +263,7 @@ describe("Testing the /readonline/requests path", () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.data.should.be.a("array");
-                    res.body.data.length.should.be.eql(3);
+                    res.body.data.length.should.be.eql(9);
 
                     done();
                 });

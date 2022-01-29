@@ -219,7 +219,8 @@ class UserService {
                     rights: user.rights,
                 };
             })
-            .catch(() => {
+            .catch((error) => {
+                console.log(error);
                 throw httpError(400, "Your email or password is incorrect.");
             });
     }

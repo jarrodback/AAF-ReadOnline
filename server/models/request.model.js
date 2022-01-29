@@ -46,6 +46,7 @@ module.exports = (mongoose) => {
                     "In Review",
                     "Needs More Information",
                     "Approved",
+                    "Needs Authorisation",
                     "Declined",
                     "Purchased",
                 ],
@@ -68,6 +69,9 @@ module.exports = (mongoose) => {
             type: String,
         },
         history: {
+            type: Array,
+        },
+        chatHistory: {
             type: Array,
         },
     });

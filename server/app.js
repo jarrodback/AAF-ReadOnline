@@ -20,6 +20,7 @@ app.use(
         name: "readonline-token",
         secret: process.env.TOKEN_SECRET,
         httpOnly: true,
+        keys: [process.env.TOKEN_SECRET],
     })
 );
 

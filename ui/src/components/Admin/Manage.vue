@@ -8,14 +8,16 @@
             <b-form-group
                 label="Configure Cost Threshold"
                 label-for="cost-input"
-                invalid-feedback="Cost is required"
-                class="threshold"
+                invalid-feedback="Cost cannot be below 100."
+                class="threshold center"
             >
                 <b-form-input
+                    type="number"
                     v-model="config.costThreshold"
                     size="sm"
                     class="mr-sm-2 threshold"
                     placeholder="Enter the cost threshold..."
+                    :state="checkThreshold"
                 ></b-form-input>
 
             </b-form-group>
@@ -48,7 +50,7 @@
                                 :value="total"
                                 variant="info"
                             >
-                                <span> {{total}} </span>
+                                <span> Total: {{total}} </span>
                             </b-progress-bar>
                         </b-progress>
                         <b-progress
@@ -61,49 +63,49 @@
                                 :value="statusCounter['Pending Review']"
                                 variant="warning"
                             >
-                                <span> {{statusCounter['Pending Review']}} </span>
+                                <span> Pending Review: {{statusCounter['Pending Review']}} </span>
                             </b-progress-bar>
 
                             <b-progress-bar
                                 :value="statusCounter['In Review']"
                                 variant="success"
                             >
-                                <span> {{statusCounter['In Review']}} </span>
+                                <span> In Review: {{statusCounter['In Review']}} </span>
                             </b-progress-bar>
 
                             <b-progress-bar
                                 :value="statusCounter['Needs More Information']"
                                 variant="danger"
                             >
-                                <span> {{statusCounter['Needs More Information']}} </span>
+                                <span> Needs More Information: {{statusCounter['Needs More Information']}} </span>
                             </b-progress-bar>
 
                             <b-progress-bar
                                 :value="statusCounter['Approved']"
                                 variant="dark"
                             >
-                                <span> {{statusCounter['Approved']}} </span>
+                                <span> Approved: {{statusCounter['Approved']}} </span>
                             </b-progress-bar>
 
                             <b-progress-bar
                                 :value="statusCounter['Needs Authorisation']"
                                 variant="danger"
                             >
-                                <span> {{statusCounter['Needs Authorisation']}} </span>
+                                <span> Needs Authorisiation: {{statusCounter['Needs Authorisation']}} </span>
                             </b-progress-bar>
 
                             <b-progress-bar
                                 :value="statusCounter['Declined']"
-                                variant="light"
+                                variant="warning"
                             >
-                                <span> {{statusCounter['Declined']}} </span>
+                                <span> Declined: {{statusCounter['Declined']}} </span>
                             </b-progress-bar>
 
                             <b-progress-bar
                                 :value="statusCounter['Purchased']"
                                 variant="secondary"
                             >
-                                <span> {{statusCounter['Purchased']}} </span>
+                                <span> Purchased: {{statusCounter['Purchased']}} </span>
                             </b-progress-bar>
 
                         </b-progress>
@@ -197,6 +199,10 @@ export default {
                 return 0;
             }
         },
+
+        checkThreshold() {
+            return this.config.costThreshold >= 100;
+        },
     },
 
     methods: {
@@ -275,13 +281,13 @@ export default {
 </script>
 
 <style>
-.half {
+/* .half {
     width: 50%;
     padding: 20px;
 }
 .flex {
     display: flex;
-}
+} */
 .bars {
     margin: auto;
 }

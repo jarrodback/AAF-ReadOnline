@@ -70,6 +70,11 @@
                     >
                         View History
                     </b-form-checkbox>
+
+                    <b-link
+                        v-if="!pendingReview(data.item)"
+                        v-on:click="requestSupportChat(data.item)"
+                    > Support chat</b-link>
                 </template>
 
                 <template #row-details="data">
@@ -592,6 +597,13 @@ export default {
             } else {
                 return this.$data.count;
             }
+        },
+
+        /**
+         * Start a support chat
+         */
+        requestSupportChat(request) {
+            this.$emit("showChat", request);
         },
     },
 };
