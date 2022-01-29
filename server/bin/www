@@ -34,39 +34,49 @@ server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 
+// Setup Socket.io event handling
 io.sockets.on("connection", (socket) => {
+    // The room id.
     let requestId = "";
 
+    /**
+     * On chat join, set the room code to be the request id and join that socket.
+     */
     socket.on("chat_join", function (data) {
-        console.log("Emitting (join): ", data);
         requestId = data.requestId;
         socket.join(requestId);
         socket.broadcast.emit("chat_join", data);
     });
 
+    /**
+     * On chat message, broadcast to other clients on the room the message.
+     */
     socket.on("chat_message", function (data) {
-        console.log("Emitting (msg): ", data);
         socket.to(requestId).emit("chat_message", data);
     });
 
+    /**
+     * On typing, broadcast to other clients on the socket in that room the message.
+     */
     socket.on("typing", function (data) {
-        console.log("Emitting (typing): ", data);
         socket.to(requestId).emit("typing", data);
     });
 
+    /**
+     * On stop typing, broadcast to other clients on the socket in that room the message.
+     */
     socket.on("stopTyping", function (data) {
-        console.log("Emitting (stop typing): ", data);
         socket.to(requestId).emit("stopTyping", data);
     });
 
+    /**
+     * On chat leave, broadcast to other clients on the socket in that room the message.
+     */
     socket.on("chat_leave", function (data) {
-        console.log("Emitting (leave): ", data);
         socket.broadcast.emit("chat_leave", data);
     });
 
-    socket.on("disconnect", () => {
-        console.log("user disconnected");
-    });
+    socket.on("disconnect", () => {});
 });
 
 /**

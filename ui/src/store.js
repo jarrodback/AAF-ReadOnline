@@ -4,16 +4,20 @@ import createPersistedState from "vuex-persistedstate";
 
 // Enable the store by passing it into Vue.
 Vue.use(Vuex);
-
 /**
  * Create the store to use.
  */
+
+var developmentBuild = process.env.NODE_ENV == "development";
+
 export const store = new Vuex.Store({
     plugins: [
         // Handle storing and retrieving data from the session storage
         // as the store is stateless.
         createPersistedState({
-            storage: window.sessionStorage,
+            storage: developmentBuild
+                ? window.sessionStorage
+                : window.localStorage,
         }),
     ],
     /**
