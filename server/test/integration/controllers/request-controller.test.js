@@ -14,7 +14,7 @@ var cookieSig;
 
 before(function (done) {
     chai.request(server)
-        .post("/auth/login")
+        .post("/api/v1/login")
         .send({
             email: "test@test.com",
             password: "test1",
@@ -27,8 +27,8 @@ before(function (done) {
         });
 });
 
-describe("Testing the /readonline/requests path", () => {
-    describe("POST /readonline/requests", () => {
+describe("Testing the /api/v1/requests path", () => {
+    describe("POST /api/v1/requests", () => {
         it("it should not create a Request without all required fields", (done) => {
             let request = {
                 name: "My Book",
@@ -40,7 +40,7 @@ describe("Testing the /readonline/requests path", () => {
             };
 
             chai.request(server)
-                .post("/readonline/requests")
+                .post("/api/v1/requests")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(request)
                 .end((err, res) => {
@@ -63,7 +63,7 @@ describe("Testing the /readonline/requests path", () => {
             };
             123456789122;
             chai.request(server)
-                .post("/readonline/requests")
+                .post("/api/v1/requests")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(request)
                 .end((err, res) => {
@@ -79,10 +79,10 @@ describe("Testing the /readonline/requests path", () => {
         });
     });
 
-    describe("GET /readonline", () => {
+    describe("GET /api/v1", () => {
         it("it should return a welcome message", (done) => {
             chai.request(server)
-                .get("/readonline")
+                .get("/api/v1")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
@@ -95,10 +95,10 @@ describe("Testing the /readonline/requests path", () => {
         });
     });
 
-    describe("GET /readonline/requests", () => {
+    describe("GET /api/v1/requests", () => {
         it("it should get all the Requests", (done) => {
             chai.request(server)
-                .get("/readonline/requests")
+                .get("/api/v1/requests")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -111,7 +111,7 @@ describe("Testing the /readonline/requests path", () => {
 
         it("it should return empty if no record was found", (done) => {
             chai.request(server)
-                .get("/readonline/requests/" + fakeId)
+                .get("/api/v1/requests/" + fakeId)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -125,7 +125,7 @@ describe("Testing the /readonline/requests path", () => {
 
         it("it should return 404 if Request Id was invalid", (done) => {
             chai.request(server)
-                .get("/readonline/requests/" + invalidId)
+                .get("/api/v1/requests/" + invalidId)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(404);
@@ -139,7 +139,7 @@ describe("Testing the /readonline/requests path", () => {
 
         it("it should GET the Request", (done) => {
             chai.request(server)
-                .get("/readonline/requests/" + request1)
+                .get("/api/v1/requests/" + request1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -156,13 +156,13 @@ describe("Testing the /readonline/requests path", () => {
         });
     });
 
-    describe("UPDATE /readonline/requests/" + request1, () => {
+    describe("UPDATE /api/v1/requests/" + request1, () => {
         it("it should update a Request", (done) => {
             let to_update = {
                 name: "My new named Book",
             };
             chai.request(server)
-                .put("/readonline/requests/" + request1)
+                .put("/api/v1/requests/" + request1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(to_update)
                 .end((err, res) => {
@@ -173,7 +173,7 @@ describe("Testing the /readonline/requests path", () => {
                 });
 
             chai.request(server)
-                .get("/readonline/requests/" + request1)
+                .get("/api/v1/requests/" + request1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     setTimeout(function () {
@@ -193,7 +193,7 @@ describe("Testing the /readonline/requests path", () => {
                 name: "My new named Book",
             };
             chai.request(server)
-                .put("/readonline/requests/" + fakeId)
+                .put("/api/v1/requests/" + fakeId)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(to_update)
                 .end((err, res) => {
@@ -207,12 +207,12 @@ describe("Testing the /readonline/requests path", () => {
         });
     });
 
-    describe("UPDATE /readonline/requests invalid", () => {
+    describe("UPDATE /api/v1/requests invalid", () => {
         let cookieUser;
         let cookieSigUser;
         before(function (done) {
             chai.request(server)
-                .post("/auth/login")
+                .post("/api/v1/login")
                 .send({
                     email: "test2@test.com",
                     password: "test2",
@@ -232,7 +232,7 @@ describe("Testing the /readonline/requests path", () => {
                 name: "My new named Book",
             };
             chai.request(server)
-                .put("/readonline/requests/123456789123")
+                .put("/api/v1/requests/123456789123")
                 .set("Cookie", cookieUser + ";  " + cookieSigUser)
                 .send(to_update)
                 .end((err, res) => {
@@ -248,17 +248,17 @@ describe("Testing the /readonline/requests path", () => {
         });
     });
 
-    describe("DELETE /readonline/requests/" + request1, () => {
+    describe("DELETE /api/v1/requests/" + request1, () => {
         it("it should delete a Request", (done) => {
             chai.request(server)
-                .delete("/readonline/requests/" + request1)
+                .delete("/api/v1/requests/" + request1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
                 });
 
             chai.request(server)
-                .get("/readonline/requests")
+                .get("/api/v1/requests")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -271,7 +271,7 @@ describe("Testing the /readonline/requests path", () => {
 
         it("it should not delete a Request with an invalid id", (done) => {
             chai.request(server)
-                .delete("/readonline/requests/2224")
+                .delete("/api/v1/requests/2224")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(404);
@@ -285,7 +285,7 @@ describe("Testing the /readonline/requests path", () => {
 
         it("it should delete all Requests", (done) => {
             chai.request(server)
-                .delete("/readonline/requests/")
+                .delete("/api/v1/requests/")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -295,7 +295,7 @@ describe("Testing the /readonline/requests path", () => {
                 });
 
             chai.request(server)
-                .get("/readonline/requests/")
+                .get("/api/v1/requests/")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -305,10 +305,10 @@ describe("Testing the /readonline/requests path", () => {
         });
     });
 
-    describe("No permission to access /readonline/requests/" + request1, () => {
+    describe("No permission to access /api/v1/requests/" + request1, () => {
         it("it should reject the request", (done) => {
             chai.request(server)
-                .get("/readonline/requests")
+                .get("/api/v1/requests")
                 .end((err, res) => {
                     res.should.have.status(401);
 

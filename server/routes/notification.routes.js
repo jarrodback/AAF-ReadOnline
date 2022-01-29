@@ -23,7 +23,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /notify/notifications/:
+ * /api/v1/notifications/:
  *   get:
  *     security:
  *       - cookieAuth: []
@@ -53,7 +53,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /notify/notifications/:
+ * /api/v1/notifications/:
  *   post:
  *     security:
  *       - cookieAuth: []
@@ -91,7 +91,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /notify/notifications/:id/:
+ * /api/v1/notifications/:id/:
  *   delete:
  *     security:
  *       - cookieAuth: []

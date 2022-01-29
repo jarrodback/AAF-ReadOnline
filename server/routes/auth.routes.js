@@ -17,7 +17,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /auth/register/:
+ * /api/v1/register/:
  *   post:
  *     summary: register account
  *     tags: [Auth]
@@ -51,7 +51,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /auth/login/:
+ * /api/v1/login/:
  *   post:
  *     summary: login to the user's account
  *     tags: [Auth]
@@ -99,7 +99,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /auth/logout/:
+ * /api/v1/logout/:
  *   post:
  *     security:
  *       - cookieAuth: []

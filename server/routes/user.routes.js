@@ -34,7 +34,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /usermanagement/users/:
+ * /api/v1/users/:
  *   get:
  *     security:
  *       - cookieAuth: []
@@ -69,7 +69,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /usermanagement/users/:id/:
+ * /api/v1/users/:id/:
  *   get:
  *     security:
  *       - cookieAuth: []
@@ -109,7 +109,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /usermanagement/users/:
+ * /api/v1/users/:
  *   post:
  *     security:
  *       - cookieAuth: []
@@ -147,7 +147,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /usermanagement/users/:
+ * /api/v1/users/:
  *   put:
  *     security:
  *       - cookieAuth: []
@@ -185,7 +185,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /usermanagement/users/:id/:
+ * /api/v1/users/:id/:
  *   delete:
  *     security:
  *       - cookieAuth: []
@@ -216,7 +216,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /usermanagement/users/:
+ * /api/v1/users/:
  *   delete:
  *     security:
  *       - cookieAuth: []

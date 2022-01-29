@@ -4,10 +4,10 @@ let server = require("../../../app");
 let should = chai.should();
 chai.use(chaiHttp);
 
-describe("Testing /auth paths", () => {
+describe("Testing /api/v1 paths", () => {
     it("user should be able to login", (done) => {
         chai.request(server)
-            .post("/auth/login")
+            .post("/api/v1/login")
             .send({
                 email: "test@test.com",
                 password: "test1",
@@ -25,7 +25,7 @@ describe("Testing /auth paths", () => {
 
     it("user shouldn't be able to login with invalid credentials", (done) => {
         chai.request(server)
-            .post("/auth/login")
+            .post("/api/v1/login")
             .send({
                 email: "test@test.com",
                 password: "test2",
@@ -44,7 +44,7 @@ describe("Testing /auth paths", () => {
 
     it("user should be able to register", (done) => {
         chai.request(server)
-            .post("/auth/register")
+            .post("/api/v1/register")
             .send({
                 email: "test5@test.com",
                 password: "test1",
@@ -64,7 +64,7 @@ describe("Testing /auth paths", () => {
 
     it("user shouldn't be able to register with duplicate email", (done) => {
         chai.request(server)
-            .post("/auth/register")
+            .post("/api/v1/register")
             .send({
                 email: "test5@test.com",
                 password: "test1",
@@ -82,7 +82,7 @@ describe("Testing /auth paths", () => {
 
     it("user shouldn't be able to register with duplicate username", (done) => {
         chai.request(server)
-            .post("/auth/register")
+            .post("/api/v1/register")
             .send({
                 email: "test6@test.com",
                 password: "test1",

@@ -39,7 +39,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /readonline/requests/:
+ * /api/v1/requests/:
  *   get:
  *     security:
  *       - cookieAuth: []
@@ -86,7 +86,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /readonline/requests/:id/:
+ * /api/v1/requests/:id/:
  *   get:
  *     security:
  *       - cookieAuth: []
@@ -138,7 +138,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /readonline/requests/:
+ * /api/v1/requests/:
  *   post:
  *     security:
  *       - cookieAuth: []
@@ -180,7 +180,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /readonline/requests/:
+ * /api/v1/requests/:
  *   put:
  *     security:
  *       - cookieAuth: []
@@ -222,7 +222,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /readonline/requests/:id/:
+ * /api/v1/requests/:id/:
  *   delete:
  *     security:
  *       - cookieAuth: []
@@ -255,7 +255,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /readonline/requests/:
+ * /api/v1/requests/:
  *   delete:
  *     security:
  *       - cookieAuth: []

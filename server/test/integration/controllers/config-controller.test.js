@@ -10,7 +10,7 @@ var cookieSig;
 
 before(function (done) {
     chai.request(server)
-        .post("/auth/login")
+        .post("/api/v1/login")
         .send({
             email: "test3@test.com",
             password: "test3",
@@ -23,11 +23,11 @@ before(function (done) {
         });
 });
 
-describe("Testing the /config/ path", () => {
+describe("Testing the /config path", () => {
     describe("Testing the employees interaction with /config/ path", () => {
         it("Employees should be able to retrieve config settings", (done) => {
             chai.request(server)
-                .get("/config/")
+                .get("/api/v1/config")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -40,7 +40,7 @@ describe("Testing the /config/ path", () => {
 
         it("Employees shouldn't be able to set config settings", (done) => {
             chai.request(server)
-                .put("/config/")
+                .put("/api/v1/config")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send({ configThreshold: 100 })
                 .end((err, res) => {
@@ -56,10 +56,10 @@ describe("Testing the /config/ path", () => {
         });
     });
 
-    describe("Testing the admins interaction with /config/ path", () => {
+    describe("Testing the admins interaction with /api/v1/ path", () => {
         before(function (done) {
             chai.request(server)
-                .post("/auth/login")
+                .post("/api/v1/login")
                 .send({
                     email: "test@test.com",
                     password: "test1",
@@ -74,7 +74,7 @@ describe("Testing the /config/ path", () => {
 
         it("Admin should be able to set config settings", (done) => {
             chai.request(server)
-                .put("/config/")
+                .put("/api/v1/config")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send({ costThreshold: 10000 })
                 .end((err, res) => {
@@ -85,7 +85,7 @@ describe("Testing the /config/ path", () => {
                 });
 
             chai.request(server)
-                .get("/config/")
+                .get("/api/v1/config")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -99,10 +99,10 @@ describe("Testing the /config/ path", () => {
         });
     });
 
-    describe("Testing the users interaction with /config/ path", () => {
+    describe("Testing the users interaction with /api/v1/ path", () => {
         before(function (done) {
             chai.request(server)
-                .post("/auth/login")
+                .post("/api/v1/login")
                 .send({
                     email: "test2@test.com",
                     password: "test2",
@@ -117,7 +117,7 @@ describe("Testing the /config/ path", () => {
 
         it("Users shouldn't be able to retrieve config settings", (done) => {
             chai.request(server)
-                .get("/config/")
+                .get("/api/v1/config")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(403);
@@ -133,7 +133,7 @@ describe("Testing the /config/ path", () => {
 
         it("Users shouldn't be able to set config settings", (done) => {
             chai.request(server)
-                .put("/config/")
+                .put("/api/v1/config")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send({ configThreshold: 100 })
                 .end((err, res) => {

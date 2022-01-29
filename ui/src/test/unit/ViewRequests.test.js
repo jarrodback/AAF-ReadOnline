@@ -1,16 +1,10 @@
-import RequestTable from "../../components/User/ViewRequests.vue";
-import { shallowMount } from "@vue/test-utils";
-import { expect } from "chai";
+const RequestTable = require("../../components/User/ViewRequests.vue");
+const { mount } = require("@vue/test-utils");
+const { expect } = require("chai");
 
-describe("Request Table", () => {
-    let component;
+test("display h2", () => {
+    const wrapper = mount(RequestTable);
 
-    beforeEach(() => {
-        wrapper = shallowMount(RequestTable);
-    });
-
-    it("should render the correct UI on mount", () => {
-        expect(wrapper.findAll("h1").length).toEqual(1);
-        expect(wrapper.findAll("h1").at(0).text()).toMatch("My Requests");
-    });
+    expect(wrapper.findAll("h1").length).toEqual(1);
+    expect(wrapper.findAll("h1").at(0).text()).toMatch("My R1equests");
 });

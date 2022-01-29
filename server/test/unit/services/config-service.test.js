@@ -2,7 +2,7 @@ let chai = require("chai");
 let chaiAsPromised = require("chai-as-promised");
 let expect = chai.expect;
 const sinon = require("sinon");
-const ConfigService = require("../../../services/ConfigService");
+const ConfigService = require("../../../services/configService");
 
 chai.use(chaiAsPromised);
 

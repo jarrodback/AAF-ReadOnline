@@ -3,11 +3,11 @@ import axios from "axios";
 /**
  * Constants that define the API urls.
  */
-const BASE_REQUESTS_URL = "http://localhost:3050/readonline/requests/";
-const BASE_USERS_URL = "http://localhost:3050/usermanagement/users/";
-const BASE_AUTH_URL = "http://localhost:3050/auth/";
-const BASE_NOTIFY_URL = "http://localhost:3050/notify/notifications/";
-const BASE_CONFIG_URL = "http://localhost:3050/config/";
+const BASE_REQUESTS_URL = "http://localhost:3050/api/v1/requests/";
+const BASE_USERS_URL = "http://localhost:3050/api/v1/users/";
+const BASE_AUTH_URL = "http://localhost:3050/api/v1/";
+const BASE_NOTIFY_URL = "http://localhost:3050/api/v1/notifications/";
+const BASE_CONFIG_URL = "http://localhost:3050/api/v1/";
 
 /**
  * Object that holds every API request.

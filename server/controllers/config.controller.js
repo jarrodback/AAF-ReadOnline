@@ -1,4 +1,4 @@
-const ConfigService = require("../services/ConfigService.js");
+const ConfigService = require("../services/configService.js");
 const configService = new ConfigService();
 
 /**

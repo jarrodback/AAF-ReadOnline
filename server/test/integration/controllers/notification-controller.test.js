@@ -14,7 +14,7 @@ var cookieSig;
 
 before(function (done) {
     chai.request(server)
-        .post("/auth/login")
+        .post("/api/v1/login")
         .send({
             email: "test2@test.com",
             password: "test2",
@@ -27,7 +27,7 @@ before(function (done) {
         });
 });
 
-describe("Testing the /notify/notifications/ path", () => {
+describe("Testing the /api/v1/notifications/ path", () => {
     describe("Users interactions with notifications", () => {
         it("can create notifications", (done) => {
             const notification = {
@@ -35,7 +35,7 @@ describe("Testing the /notify/notifications/ path", () => {
                 username: "usER1",
             };
             chai.request(server)
-                .post("/notify/notifications/")
+                .post("/api/v1/notifications/")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(notification)
                 .end((err, res) => {
@@ -50,7 +50,7 @@ describe("Testing the /notify/notifications/ path", () => {
 
         it("Users should be able to retrieve all notifications for themselves", (done) => {
             chai.request(server)
-                .get("/notify/notifications/?username=usER1")
+                .get("/api/v1/notifications/?username=usER1")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -61,7 +61,7 @@ describe("Testing the /notify/notifications/ path", () => {
 
         it("Users should be able to delete notifications for themselves", (done) => {
             chai.request(server)
-                .delete("/notify/notifications/555555555555")
+                .delete("/api/v1/notifications/555555555555")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -72,7 +72,7 @@ describe("Testing the /notify/notifications/ path", () => {
 
         it("Users shouldn't be able to delete notifications that aren't theirs", (done) => {
             chai.request(server)
-                .delete("/notify/notifications/655555555555")
+                .delete("/api/v1/notifications/655555555555")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(403);
@@ -92,7 +92,7 @@ describe("Testing the /notify/notifications/ path", () => {
                 username: "usER1",
             };
             chai.request(server)
-                .post("/notify/notifications/")
+                .post("/api/v1/notifications/")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(notification)
                 .end((err, res) => {

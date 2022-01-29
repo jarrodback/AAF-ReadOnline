@@ -11,16 +11,16 @@ const {
 var configController = require("../controllers/config.controller");
 
 // Update a config setting
-router.put("/", checkJwtToken, isAdmin, configController.update);
+router.put("/config/", checkJwtToken, isAdmin, configController.update);
 
 // Retrieve all config settings
-router.get("/", checkJwtToken, isEmployee, configController.findAll);
+router.get("/config/", checkJwtToken, isEmployee, configController.findAll);
 
 module.exports = router;
 
 /**
  * @swagger
- * /config/:
+ * /api/v1/config:
  *   get:
  *     security:
  *       - cookieAuth: []
@@ -44,7 +44,7 @@ module.exports = router;
 
 /**
  * @swagger
- * /config/:
+ * /api/v1/config/:
  *   put:
  *     security:
  *       - cookieAuth: []

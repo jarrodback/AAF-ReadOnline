@@ -93,11 +93,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Configuring the main routes
-app.use("/readonline", requestRouter);
-app.use("/usermanagement", userRouter);
-app.use("/auth", authRouter);
-app.use("/notify", notificationRouter);
-app.use("/config", configRouter);
+app.use("/api/v1", requestRouter);
+app.use("/api/v1", userRouter);
+app.use("/api/v1", authRouter);
+app.use("/api/v1", notificationRouter);
+app.use("/api/v1", configRouter);
 
 /**
  * Error handling

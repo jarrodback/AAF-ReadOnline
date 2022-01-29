@@ -14,7 +14,7 @@ var cookieSig;
 
 before(function (done) {
     chai.request(server)
-        .post("/auth/login")
+        .post("/api/v1/login")
         .send({
             email: "test@test.com",
             password: "test1",
@@ -27,12 +27,12 @@ before(function (done) {
         });
 });
 
-describe("Testing the /usermanagement/users path", () => {
-    describe("POST /usermanagement/users", () => {
+describe("Testing the /api/v1/users path", () => {
+    describe("POST /api/v1/users", () => {
         it("it should not create a User without all required fields", (done) => {
             let request = {};
             chai.request(server)
-                .post("/usermanagement/users")
+                .post("/api/v1/users")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(request)
                 .end((err, res) => {
@@ -54,7 +54,7 @@ describe("Testing the /usermanagement/users path", () => {
                 role: "Admin",
             };
             chai.request(server)
-                .post("/usermanagement/users")
+                .post("/api/v1/users")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(request)
                 .end((err, res) => {
@@ -77,7 +77,7 @@ describe("Testing the /usermanagement/users path", () => {
                 role: "Admin",
             };
             chai.request(server)
-                .post("/usermanagement/users")
+                .post("/api/v1/users")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(request)
                 .end((err, res) => {
@@ -92,27 +92,27 @@ describe("Testing the /usermanagement/users path", () => {
         });
     });
 
-    describe("GET /usermanagement", () => {
+    describe("GET /api/v1", () => {
         it("it should return a welcome message", (done) => {
             chai.request(server)
-                .get("/usermanagement")
+                .get("/api/v1")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("object");
                     res.body.should.have
                         .property("message")
-                        .eql("Welcome to the user management API.");
+                        .eql("Welcome to the ReadOnline API.");
 
                     done();
                 });
         });
     });
 
-    describe("GET /usermanagement/users", () => {
+    describe("GET /api/v1/users", () => {
         it("it should get all the Users", (done) => {
             chai.request(server)
-                .get("/usermanagement/users")
+                .get("/api/v1/users")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -125,7 +125,7 @@ describe("Testing the /usermanagement/users path", () => {
 
         it("it should return 200 if no User was found", (done) => {
             chai.request(server)
-                .get("/usermanagement/users/" + fakeId)
+                .get("/api/v1/users/" + fakeId)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -136,7 +136,7 @@ describe("Testing the /usermanagement/users path", () => {
 
         it("it should return 404 if User Id was invalid", (done) => {
             chai.request(server)
-                .get("/usermanagement/users/" + invalidId)
+                .get("/api/v1/users/" + invalidId)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(404);
@@ -150,7 +150,7 @@ describe("Testing the /usermanagement/users path", () => {
 
         it("it should GET the User", (done) => {
             chai.request(server)
-                .get("/usermanagement/users/" + user1)
+                .get("/api/v1/users/" + user1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -167,13 +167,13 @@ describe("Testing the /usermanagement/users path", () => {
         });
     });
 
-    describe("UPDATE /usermanagement/users/" + user1, () => {
+    describe("UPDATE /api/v1/users/" + user1, () => {
         it("it should update a User", (done) => {
             let to_update = {
                 username: "backjarrod",
             };
             chai.request(server)
-                .put("/usermanagement/users/" + user1)
+                .put("/api/v1/users/" + user1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(to_update)
                 .end((err, res) => {
@@ -181,7 +181,7 @@ describe("Testing the /usermanagement/users path", () => {
                 });
 
             chai.request(server)
-                .get("/usermanagement/users/" + user1)
+                .get("/api/v1/users/" + user1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -198,7 +198,7 @@ describe("Testing the /usermanagement/users path", () => {
                 username: "bob12",
             };
             chai.request(server)
-                .put("/usermanagement/users/" + fakeId)
+                .put("/api/v1/users/" + fakeId)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(to_update)
                 .end((err, res) => {
@@ -212,10 +212,10 @@ describe("Testing the /usermanagement/users path", () => {
         });
     });
 
-    describe("DELETE /usermanagement/users/" + user1, () => {
+    describe("DELETE /api/v1/users/" + user1, () => {
         it("it should delete a User", (done) => {
             chai.request(server)
-                .delete("/usermanagement/users/" + user1)
+                .delete("/api/v1/users/" + user1)
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -226,7 +226,7 @@ describe("Testing the /usermanagement/users path", () => {
 
     it("it should not delete a User with an invalid id", (done) => {
         chai.request(server)
-            .delete("/usermanagement/users/" + fakeId)
+            .delete("/api/v1/users/" + fakeId)
             .set("Cookie", cookie + "; " + cookieSig)
             .end((err, res) => {
                 res.should.have.status(404);
@@ -241,7 +241,7 @@ describe("Testing the /usermanagement/users path", () => {
     describe("Endpoints should reject user when not authenticated", () => {
         it("Unauthenticated user shouldn't be able to view requests", (done) => {
             chai.request(server)
-                .get("/usermanagement/users/")
+                .get("/api/v1/users/")
                 .end((err, res) => {
                     res.should.have.status(401);
                     res.should.be.a("object");
@@ -263,7 +263,7 @@ describe("Testing the /usermanagement/users path", () => {
                 role: "Admin",
             };
             chai.request(server)
-                .post("/usermanagement/users")
+                .post("/api/v1/users")
                 .set("Cookie", "goiegjei")
                 .send(request)
                 .end((err, res) => {
@@ -285,7 +285,7 @@ describe("Testing the /usermanagement/users path", () => {
 
         before(function (done) {
             chai.request(server)
-                .post("/auth/login")
+                .post("/api/v1/login")
                 .send({
                     email: "test2@test.com",
                     password: "test2",
@@ -309,7 +309,7 @@ describe("Testing the /usermanagement/users path", () => {
             };
 
             chai.request(server)
-                .post("/usermanagement/users")
+                .post("/api/v1/users")
                 .set("Cookie", cookieUser + ";  " + cookieSigUser)
                 .send(request)
                 .end((err, res) => {
@@ -336,7 +336,7 @@ describe("Testing the /usermanagement/users path", () => {
             };
 
             chai.request(server)
-                .put("/usermanagement/users/" + user1)
+                .put("/api/v1/users/" + user1)
                 .set("Cookie", cookieUser + ";  " + cookieSigUser)
                 .send(request)
                 .end((err, res) => {
@@ -353,17 +353,17 @@ describe("Testing the /usermanagement/users path", () => {
         });
     });
 
-    describe("DELETE /usermanagement/users/", () => {
+    describe("DELETE /api/v1/users/", () => {
         it("it should delete all Users", (done) => {
             chai.request(server)
-                .delete("/usermanagement/users/")
+                .delete("/api/v1/users/")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
                 });
 
             chai.request(server)
-                .get("/usermanagement/users/")
+                .get("/api/v1/users/")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -383,7 +383,7 @@ describe("Testing the /usermanagement/users path", () => {
                 role: "Admin",
             };
             chai.request(server)
-                .post("/usermanagement/users")
+                .post("/api/v1/users")
                 .set("Cookie", cookie + ";  " + cookieSig)
                 .send(request)
                 .end((err, res) => {

@@ -80,7 +80,7 @@ export default new Router({
         },
         // Path to view user management. Must be an admin.
         {
-            path: "/usermanagement/",
+            path: "/usermanagement",
             name: "usermanagement",
             component: UserManagement,
             beforeEnter: isAdmin,
