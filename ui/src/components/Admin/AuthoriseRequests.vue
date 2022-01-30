@@ -333,6 +333,14 @@ export default {
 
             notify(this, "Succesfully declined the request.", "darkenSuccess");
             this.updateRequest(payload);
+
+            const notifyPayload = {
+                message:
+                    "Your request for " + request.name + " has been declined.",
+                username: request.requestingUser,
+            };
+
+            api.createNotification(notifyPayload);
         },
 
         /**
@@ -388,6 +396,15 @@ export default {
 
             notify(this, "Succesfully approved the request.", "darkenSuccess");
             this.updateRequest(payload);
+
+            const notifyPayload = {
+                message:
+                    "Your request for " +
+                    request.name +
+                    " has been approved and purchased.",
+                username: request.requestingUser,
+            };
+            api.createNotification(notifyPayload);
         },
 
         /**

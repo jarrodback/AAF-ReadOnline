@@ -282,7 +282,7 @@ export default {
          * Navigate to the User Management page.
          */
         goToUserManagementPage() {
-            this.$router.push("/api/v1").catch(() => {});
+            this.$router.push("/usermanagement").catch(() => {});
         },
 
         /**

@@ -235,22 +235,6 @@ function validateRequest(request) {
 }
 
 /**
- *  Validates the data in a  delete Request.
- *
- * @returns {Boolean} True if request is not in certain statuses.
- */
-// function isValidDeleteRequest(request) {
-//     if (
-//         request.status == "Pending Review" ||
-//         request.status == "Approved" ||
-//         request.status == "Declined"
-//     ) {
-//         return true;
-//     }
-//     return false;
-// }
-
-/**
  *  Validates the data in a update Request.
  *
  * @returns {Boolean} True if the object contains required info.
