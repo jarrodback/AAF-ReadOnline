@@ -20,6 +20,7 @@ app.use(
         name: "readonline-token",
         secret: process.env.TOKEN_SECRET,
         httpOnly: true,
+        //secure: true - Disabled as don't use HTTPS over local host so the cookie won't set.
         keys: [process.env.TOKEN_SECRET],
     })
 );
