@@ -117,4 +117,55 @@ app.use(function (err, req, res, next) {
     res.render("error");
 });
 
-module.exports = app;
+// Setup Socket.io event handling
+const io = require("socket.io")({
+    cors: {
+        origins: ["http://localhost:8080"],
+    },
+});
+
+io.sockets.on("connection", (socket) => {
+    // The room id.
+    let requestId = "";
+
+    /**
+     * On chat join, set the room code to be the request id and join that socket.
+     */
+    socket.on("chat_join", function (data) {
+        requestId = data.requestId;
+        socket.join(requestId);
+        socket.broadcast.emit("chat_join", data);
+    });
+
+    /**
+     * On chat message, broadcast to other clients on the room the message.
+     */
+    socket.on("chat_message", function (data) {
+        socket.to(requestId).emit("chat_message", data);
+    });
+
+    /**
+     * On typing, broadcast to other clients on the socket in that room the message.
+     */
+    socket.on("typing", function (data) {
+        socket.to(requestId).emit("typing", data);
+    });
+
+    /**
+     * On stop typing, broadcast to other clients on the socket in that room the message.
+     */
+    socket.on("stopTyping", function (data) {
+        socket.to(requestId).emit("stopTyping", data);
+    });
+
+    /**
+     * On chat leave, broadcast to other clients on the socket in that room the message.
+     */
+    socket.on("chat_leave", function (data) {
+        socket.broadcast.emit("chat_leave", data);
+    });
+
+    socket.on("disconnect", () => {});
+});
+
+module.exports = { app, io };

@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var app = require("../app");
+var { app, io } = require("../app");
 var debug = require("debug")("readonline:server");
 var http = require("http");
 
@@ -20,11 +20,8 @@ app.set("port", port);
  */
 
 var server = http.createServer(app);
-const io = require("socket.io")(server, {
-    cors: {
-        origins: ["http://localhost:8080"],
-    },
-});
+// Add socket listener
+io.attach(server);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -33,51 +30,6 @@ const io = require("socket.io")(server, {
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
-
-// Setup Socket.io event handling
-io.sockets.on("connection", (socket) => {
-    // The room id.
-    let requestId = "";
-
-    /**
-     * On chat join, set the room code to be the request id and join that socket.
-     */
-    socket.on("chat_join", function (data) {
-        requestId = data.requestId;
-        socket.join(requestId);
-        socket.broadcast.emit("chat_join", data);
-    });
-
-    /**
-     * On chat message, broadcast to other clients on the room the message.
-     */
-    socket.on("chat_message", function (data) {
-        socket.to(requestId).emit("chat_message", data);
-    });
-
-    /**
-     * On typing, broadcast to other clients on the socket in that room the message.
-     */
-    socket.on("typing", function (data) {
-        socket.to(requestId).emit("typing", data);
-    });
-
-    /**
-     * On stop typing, broadcast to other clients on the socket in that room the message.
-     */
-    socket.on("stopTyping", function (data) {
-        socket.to(requestId).emit("stopTyping", data);
-    });
-
-    /**
-     * On chat leave, broadcast to other clients on the socket in that room the message.
-     */
-    socket.on("chat_leave", function (data) {
-        socket.broadcast.emit("chat_leave", data);
-    });
-
-    socket.on("disconnect", () => {});
-});
 
 /**
  * Normalize a port into a number, string, or false.
