@@ -1,18 +1,16 @@
-let chai = require('chai');
-let chaiHttp = require('chai-http');
-let server = require('../app');
+let chai = require("chai");
+let chaiHttp = require("chai-http");
+let server = require("../app").app;
 let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('backend root', () =>{
-    it('it should return a 404', () => {
-
-    chai.request(server)
-        .get('/')
-        .end((err, res)=>{
-            res.should.have.status(404);
-        });
+describe("backend root", () => {
+    it("it should return a 404", () => {
+        chai.request(server)
+            .get("/")
+            .end((err, res) => {
+                res.should.have.status(404);
+            });
     });
 });
-
